@@ -1,11 +1,14 @@
 import { Component, signal } from '@angular/core';
+import { Header } from './header/header';
+
 
 @Component({
   selector: 'app-root',
-  imports: [],
+  standalone: true,
+  imports: [Header],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrls: ['./app.scss']
 })
-export class App {
+export class AppComponent {
   protected readonly title = signal('brisanet-landing');
 }
