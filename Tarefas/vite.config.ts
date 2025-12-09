@@ -3,9 +3,9 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  base: './', // Ensures relative paths for assets so it works on GitHub Pages subdirectories
+  base: '/Tarefas/', // Configurado exatamente para o link com T maiúsculo
   define: {
-    'process.env': {} // Shim for process.env to avoid crashes in browser
+    'process.env': {}
   },
   build: {
     outDir: 'dist',

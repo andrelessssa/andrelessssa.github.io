@@ -1,0 +1,60 @@
+name: Deploy Tarefas
+
+on:
+  push:
+    branches: ["main", "master"]
+    paths:
+      - 'Tarefas/**' # Corrigido para T maiúsculo
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Tarefas # Corrigido para T maiúsculo
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Build
+        run: npm run build
+        
+      # Passo Extra: Prepara a pasta para ficar dentro de /Tarefas/ no site final
+      - name: Prepare Subfolder Deployment
+        run: |
+          mkdir -p ../site_output/Tarefas
+          cp -r dist/* ../site_output/Tarefas/
+        
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site_output # Envia a pasta raiz que contem /Tarefas dentro
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
