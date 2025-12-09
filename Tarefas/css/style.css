@@ -35,6 +35,6 @@
 
 /* Utilitários */
 .task-checkbox:checked + div {
-    background-color: #ef4444; /* Vermelho */
-    border-color: #ef4444;
+    background-color: #3b82f6; /* Azul */
+    border-color: #3b82f6;
 }

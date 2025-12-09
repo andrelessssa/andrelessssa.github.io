@@ -37,20 +37,20 @@
     <!-- Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- Configuração do Tailwind (MUDANÇA PARA VERMELHO) -->
+    <!-- Configuração do Tailwind (AZUL) -->
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
               brand: {
-                50: '#fef2f2',  /* red-50 */
-                100: '#fee2e2', /* red-100 */
-                200: '#fecaca', /* red-200 */
-                500: '#ef4444', /* red-500 - Cor Principal */
-                600: '#dc2626', /* red-600 - Hover */
-                700: '#b91c1c', /* red-700 */
-                900: '#7f1d1d', /* red-900 */
+                50: '#eff6ff', 
+                100: '#dbeafe', 
+                200: '#bfdbfe', 
+                500: '#3b82f6', /* Blue-500 - Cor Principal */
+                600: '#2563eb', /* Blue-600 - Hover */
+                700: '#1d4ed8', 
+                900: '#1e3a8a', 
               }
             }
           }
@@ -85,13 +85,13 @@
              </h4>
              
              <!-- Botão Conectar (Visível quando desconectado) -->
-             <button id="btn-drive-connect" onclick="app.connectDrive()" class="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-red-600 transition-colors">
+             <button id="btn-drive-connect" onclick="app.connectDrive()" class="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition-colors">
                 <i class="fas fa-plug"></i> Conectar Drive
              </button>
 
              <!-- Controles (Visíveis quando conectado) -->
              <div id="drive-controls" class="hidden space-y-1">
-                 <button onclick="app.uploadToDrive()" class="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-red-600 transition-colors">
+                 <button onclick="app.uploadToDrive()" class="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-brand-600 transition-colors">
                     <i class="fas fa-cloud-upload-alt w-4"></i> Salvar
                  </button>
                  <button onclick="app.restoreFromDrive()" class="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-50 hover:text-emerald-600 transition-colors">
@@ -234,7 +234,7 @@
             </div>
 
             <!-- Área IA -->
-            <div class="bg-gradient-to-br from-brand-900 to-red-900 rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
+            <div class="bg-gradient-to-br from-brand-900 to-indigo-900 rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
                 <div class="absolute top-0 right-0 p-32 bg-white opacity-5 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
                 <div class="relative z-10">
                     <div class="flex items-center justify-between mb-6">

@@ -444,8 +444,8 @@ window.app = {
                 labels: Object.keys(categories),
                 datasets: [{
                     data: Object.values(categories),
-                    // Cores do gráfico ajustadas para Vermelho predominante
-                    backgroundColor: ['#ef4444', '#10b981', '#f59e0b', '#dc2626']
+                    // CORES AZULADAS
+                    backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#2563eb']
                 }]
             },
             options: chartConfig
@@ -462,7 +462,7 @@ window.app = {
                 datasets: [{
                     label: 'Tarefas',
                     data: Object.values(daily),
-                    backgroundColor: '#ef4444', // Vermelho principal
+                    backgroundColor: '#3b82f6', // Azul principal
                     borderRadius: 4
                 }]
             },
