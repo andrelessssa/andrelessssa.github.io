@@ -128,7 +128,7 @@ window.app = {
                 <div class="ml-4 flex-grow min-w-0">
                     <div class="flex items-center gap-2">
                         <h3 class="text-sm font-medium text-slate-900 truncate ${task.isCompleted ? 'line-through text-slate-500' : ''}">${task.title}</h3>
-                        ${task.isRecurring ? '<i class="fas fa-sync-alt text-[10px] text-blue-500" title="Diária"></i>' : ''}
+                        ${task.isRecurring ? '<i class="fas fa-sync-alt text-[10px] text-brand-500" title="Diária"></i>' : ''}
                     </div>
                     <div class="flex items-center gap-2 mt-1">
                         <span class="text-[10px] px-2 py-0.5 rounded-full border ${priorityColors[task.priority] || ''}">${task.priority}</span>
@@ -444,7 +444,8 @@ window.app = {
                 labels: Object.keys(categories),
                 datasets: [{
                     data: Object.values(categories),
-                    backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444']
+                    // Cores do gráfico ajustadas para Vermelho predominante
+                    backgroundColor: ['#ef4444', '#10b981', '#f59e0b', '#dc2626']
                 }]
             },
             options: chartConfig
@@ -461,7 +462,7 @@ window.app = {
                 datasets: [{
                     label: 'Tarefas',
                     data: Object.values(daily),
-                    backgroundColor: '#3b82f6',
+                    backgroundColor: '#ef4444', // Vermelho principal
                     borderRadius: 4
                 }]
             },

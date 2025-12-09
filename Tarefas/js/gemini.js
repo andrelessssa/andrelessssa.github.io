@@ -35,10 +35,17 @@ export const geminiService = {
               Foque em: 1 elogio, 1 ponto de atenção e 1 dica prática. Use Markdown (negrito em palavras chave).
             `;
 
-            const response = await ai.models.generateContent({
+            // Timeout Wrapper: Evita que a requisição fique presa para sempre
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error("TIMEOUT")), 15000); // 15 segundos max
+            });
+
+            const apiPromise = ai.models.generateContent({
               model: 'gemini-2.5-flash',
               contents: prompt,
             });
+
+            const response = await Promise.race([apiPromise, timeoutPromise]);
 
             return response.text;
         } catch (error) {
@@ -46,7 +53,10 @@ export const geminiService = {
             if (error.message === "API_KEY_MISSING") {
                 return "KEY_MISSING"; // Sinal para o App pedir a chave
             }
-            return "Erro ao conectar com a Inteligência Artificial. Verifique sua conexão ou se a Chave API é válida.";
+            if (error.message === "TIMEOUT") {
+                return "O tempo limite de conexão excedeu. Verifique sua internet e tente novamente.";
+            }
+            return `Erro ao conectar com a Inteligência Artificial (${error.message || 'Desconhecido'}).`;
         }
     }
 };
