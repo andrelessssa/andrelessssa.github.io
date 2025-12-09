@@ -29,6 +29,7 @@ window.app = {
             try {
                 await driveService.init();
                 console.log("Drive Initialized");
+                this.updateDriveUI(true); // Atualiza UI se já tiver token válido/config
             } catch (e) {
                 console.error("Drive Init Fail", e);
             }
@@ -214,39 +215,60 @@ window.app = {
 
     // --- Lógica de Drive (Nuvem) ---
     async connectDrive() {
+        // Passo 1: Configuração
         if (!driveService.getConfig()) {
-            const clientId = prompt("Insira seu Google Client ID:");
+            const clientId = prompt("Configuração Inicial:\n\nInsira seu Google Client ID:");
             if (!clientId) return;
             const apiKey = prompt("Insira sua Google API Key:");
             if (!apiKey) return;
             driveService.saveConfig(clientId, apiKey);
-            await driveService.init();
+            
+            // Recarrega init com nova config
+            try {
+                await driveService.init();
+            } catch (e) {
+                alert("Erro ao inicializar scripts do Google. Tente recarregar a página.");
+                return;
+            }
         }
 
+        // Passo 2: Autenticação
         try {
+            const btnConnect = document.getElementById('btn-drive-connect');
+            const originalText = btnConnect.innerHTML;
+            btnConnect.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Conectando...';
+            
             await driveService.connect();
             this.updateDriveUI(true);
-            alert("Conectado ao Google Drive!");
+            alert("✅ Conectado ao Google Drive com sucesso!");
         } catch (e) {
             console.error(e);
-            alert("Erro ao conectar. Verifique o console.");
+            alert("Erro ao conectar. Verifique se o Client ID está correto e se você autorizou o pop-up.");
+        } finally {
+             const btnConnect = document.getElementById('btn-drive-connect');
+             if(btnConnect) btnConnect.innerHTML = '<i class="fas fa-plug"></i> Conectar Drive';
         }
     },
 
     async uploadToDrive() {
-        if(confirm("Deseja substituir o backup na nuvem pelas tarefas atuais?")) {
+        if(confirm("Deseja SALVAR suas tarefas locais no Google Drive? (Isso substituirá o backup anterior)")) {
             try {
+                document.body.style.cursor = 'wait';
                 await driveService.upload(state.tasks);
-                alert("Backup salvo com sucesso!");
+                alert("✅ Backup salvo com sucesso!");
             } catch (e) {
-                alert("Erro ao salvar no Drive.");
+                console.error(e);
+                alert("❌ Erro ao salvar no Drive. Verifique a conexão.");
+            } finally {
+                document.body.style.cursor = 'default';
             }
         }
     },
 
     async restoreFromDrive() {
-        if(confirm("Isso substituirá suas tarefas locais pelo backup da nuvem. Continuar?")) {
+        if(confirm("⚠️ Atenção: Isso substituirá TODAS suas tarefas locais pelo backup da nuvem. Continuar?")) {
             try {
+                document.body.style.cursor = 'wait';
                 const tasks = await driveService.download();
                 if(tasks) {
                     state.tasks = tasks;
@@ -254,12 +276,15 @@ window.app = {
                     // Reprocessa recorrências caso o backup seja antigo
                     state.tasks = storage.processRecurring();
                     this.renderTasks();
-                    alert("Dados restaurados com sucesso!");
+                    alert("✅ Dados restaurados com sucesso!");
                 } else {
-                    alert("Nenhum backup encontrado.");
+                    alert("⚠️ Nenhum backup encontrado no Drive.");
                 }
             } catch (e) {
-                alert("Erro ao baixar do Drive.");
+                console.error(e);
+                alert("❌ Erro ao baixar do Drive.");
+            } finally {
+                document.body.style.cursor = 'default';
             }
         }
     },
@@ -267,6 +292,7 @@ window.app = {
     disconnectDrive() {
         driveService.disconnect();
         this.updateDriveUI(false);
+        alert("Desconectado do Google Drive.");
     },
 
     updateDriveUI(isConnected) {
@@ -274,19 +300,35 @@ window.app = {
         const controls = document.getElementById('drive-controls');
         const navMobile = document.getElementById('nav-drive-mobile');
         
+        // Estado do botão mobile
+        if(navMobile) {
+            navMobile.onclick = isConnected ? () => this.uploadToDrive() : () => this.connectDrive();
+            const icon = navMobile.querySelector('i');
+            const text = navMobile.querySelector('span');
+            
+            if(isConnected) {
+                navMobile.classList.add('text-brand-600');
+                if(icon) icon.className = "fas fa-cloud-upload-alt text-xl mb-1";
+                if(text) text.innerText = "Salvar";
+            } else {
+                navMobile.classList.remove('text-brand-600');
+                if(icon) icon.className = "fab fa-google-drive text-xl mb-1";
+                if(text) text.innerText = "Nuvem";
+            }
+        }
+
+        // Estado da Sidebar
         if (isConnected) {
             btnConnect.classList.add('hidden');
             controls.classList.remove('hidden');
-            if(navMobile) navMobile.classList.add('text-brand-600');
         } else {
             btnConnect.classList.remove('hidden');
             controls.classList.add('hidden');
-            if(navMobile) navMobile.classList.remove('text-brand-600');
         }
     },
 
     handleMobileDriveAction() {
-        // Atalho simples para mobile: se conectado, pergunta upload, se não, conecta
+        // Redireciona para o handler correto baseado no estado
         if (driveService.isConnected) {
             this.uploadToDrive();
         } else {
@@ -322,12 +364,12 @@ window.app = {
                     // Processa recorrencia
                     state.tasks = storage.processRecurring();
                     this.renderTasks();
-                    alert("Importação concluída!");
+                    alert("✅ Importação concluída!");
                 } else {
-                    alert("Formato de arquivo inválido.");
+                    alert("❌ Formato de arquivo inválido.");
                 }
             } catch (err) {
-                alert("Erro ao ler o arquivo JSON.");
+                alert("❌ Erro ao ler o arquivo JSON.");
             }
         };
         reader.readAsText(file);
@@ -437,27 +479,49 @@ window.app = {
         const btn = document.getElementById('btn-ai-generate');
         const resultDiv = document.getElementById('ai-result');
         
+        // Estado de Carregamento
         btn.disabled = true;
+        const originalBtnText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analisando...';
         resultDiv.innerHTML = '<p class="text-brand-200 animate-pulse">Consultando o Gemini AI...</p>';
 
-        const tasks = this.getFilteredTasksForReport();
-        const stats = {
-            totalTasks: tasks.length,
-            completionRate: tasks.length > 0 ? Math.round((tasks.filter(t => t.isCompleted).length / tasks.length) * 100) : 0
-        };
+        try {
+            const tasks = this.getFilteredTasksForReport();
+            const stats = {
+                totalTasks: tasks.length,
+                completionRate: tasks.length > 0 ? Math.round((tasks.filter(t => t.isCompleted).length / tasks.length) * 100) : 0
+            };
 
-        const report = await geminiService.generateReport(tasks, state.period, stats);
-        
-        // Simple Markdown parser for bold text
-        const formattedReport = report
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\n/g, '<br>');
+            const report = await geminiService.generateReport(tasks, state.period, stats);
+            
+            // Se retornar KEY_MISSING, pede ao usuário
+            if (report === "KEY_MISSING") {
+                const newKey = prompt("Para gerar relatórios com IA, insira sua chave da API do Gemini (Google AI Studio):");
+                if (newKey) {
+                    geminiService.setKey(newKey);
+                    // Tenta novamente recursivamente
+                    return this.generateAI(); 
+                } else {
+                    resultDiv.innerHTML = '<p class="text-red-300">Relatório cancelado: Chave API não fornecida.</p>';
+                    return;
+                }
+            }
+            
+            // Formata e exibe
+            const formattedReport = report
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n/g, '<br>');
 
-        resultDiv.innerHTML = formattedReport;
-        
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-magic"></i> Gerar Novamente';
+            resultDiv.innerHTML = formattedReport;
+
+        } catch (error) {
+            console.error(error);
+            resultDiv.innerHTML = '<p class="text-red-300">Ocorreu um erro ao gerar o relatório.</p>';
+        } finally {
+            // Garante que o botão seja reativado SEMPRE (fim do loop infinito)
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-magic"></i> Gerar Novamente';
+        }
     }
 };
 

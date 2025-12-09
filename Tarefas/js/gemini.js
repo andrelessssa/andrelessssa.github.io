@@ -1,16 +1,23 @@
 import { GoogleGenAI } from "@google/genai";
 
+const GEMINI_KEY_STORAGE = 'taskflow_gemini_api_key';
+
 export const geminiService = {
+    getKey() {
+        return localStorage.getItem(GEMINI_KEY_STORAGE);
+    },
+
+    setKey(key) {
+        localStorage.setItem(GEMINI_KEY_STORAGE, key);
+    },
+
     async generateReport(tasks, period, stats) {
         try {
-            // Tenta pegar a chave do ambiente (injetada via GitHub Actions ou input manual)
-            // Como é um app estático client-side, num cenário real o usuário colocaria a chave
-            // Mas aqui assumimos que process.env.API_KEY pode estar disponível se configurado no build, 
-            // ou falharemos graciosamente.
-            const apiKey = process.env.API_KEY; 
+            // Tenta pegar a chave do localStorage
+            const apiKey = this.getKey();
 
             if (!apiKey) {
-                return "⚠️ **Configuração Necessária:** API Key não detectada. Por favor, configure sua chave do Google AI Studio.";
+                throw new Error("API_KEY_MISSING");
             }
 
             const ai = new GoogleGenAI({ apiKey });
@@ -25,7 +32,7 @@ export const geminiService = {
               Lista parcial:
               ${taskSummary}
               
-              Foque em: 1 elogio, 1 ponto de atenção e 1 dica prática. Use Markdown.
+              Foque em: 1 elogio, 1 ponto de atenção e 1 dica prática. Use Markdown (negrito em palavras chave).
             `;
 
             const response = await ai.models.generateContent({
@@ -36,7 +43,10 @@ export const geminiService = {
             return response.text;
         } catch (error) {
             console.error("Gemini Error:", error);
-            return "Erro ao conectar com a Inteligência Artificial. Verifique sua conexão ou chave API.";
+            if (error.message === "API_KEY_MISSING") {
+                return "KEY_MISSING"; // Sinal para o App pedir a chave
+            }
+            return "Erro ao conectar com a Inteligência Artificial. Verifique sua conexão ou se a Chave API é válida.";
         }
     }
 };
