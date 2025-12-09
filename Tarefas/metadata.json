@@ -1,0 +1,5 @@
+{
+  "name": "André Lessa",
+  "description": "Um painel inteligente de gerenciamento de tarefas com relatórios de produtividade semanais, mensais e anuais automatizados, alimentados pelo Gemini AI.",
+  "requestFramePermissions": []
+}
