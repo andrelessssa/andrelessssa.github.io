@@ -9,7 +9,15 @@ const periodMap: Record<Period, string> = {
 
 export const generateAIReport = async (tasks: Task[], period: Period, stats: ReportData): Promise<string> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    // Safety check: In a static GitHub Pages build, process.env might be empty.
+    // Ideally, the user should provide the key via UI input if not baked in at build time.
+    const apiKey = process.env.API_KEY;
+    
+    if (!apiKey) {
+      return "⚠️ Configuração Necessária: A chave da API (API Key) não foi encontrada. Como este é um app estático, a chave precisa ser configurada no código ou via interface.";
+    }
+
+    const ai = new GoogleGenAI({ apiKey });
     
     // Prepare context for the model
     const taskSummary = tasks.map(t => 
@@ -42,6 +50,6 @@ export const generateAIReport = async (tasks: Task[], period: Period, stats: Rep
     return response.text || "Não foi possível gerar a análise neste momento.";
   } catch (error) {
     console.error("Gemini API Error:", error);
-    return "Erro ao gerar relatório com IA. Por favor, verifique sua chave de API ou conexão com a internet.";
+    return "Erro ao gerar relatório com IA. Por favor, verifique sua conexão ou se a API Key é válida.";
   }
 };
