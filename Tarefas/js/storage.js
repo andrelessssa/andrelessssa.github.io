@@ -37,42 +37,59 @@ export const storage = {
 
     // Lógica inteligente de recorrência
     processRecurring() {
-        const tasks = this.getTasks();
-        const today = new Date().toISOString().split('T')[0];
-        let hasChanges = false;
-        
-        const newTaskList = [];
-        
-        tasks.forEach(task => {
-            // Se for recorrente, completada e de data anterior a hoje
-            if (task.isRecurring && task.isCompleted && task.completedAt) {
-                const completionDate = task.completedAt.split('T')[0];
-                
-                if (completionDate < today) {
-                    hasChanges = true;
-                    
-                    // 1. Arquiva a antiga (remove flag de recorrência para não duplicar de novo)
-                    newTaskList.push({ ...task, isRecurring: false });
+    const today = new Date().toISOString().split('T')[0];
 
-                    // 2. Cria a nova tarefa para hoje
-                    newTaskList.push({
-                        ...task,
-                        id: crypto.randomUUID(),
-                        isCompleted: false,
-                        completedAt: null,
-                        createdAt: new Date().toISOString(),
-                        dueDate: new Date().toISOString(), // Hoje
-                        isRecurring: true
-                    });
-                    return;
-                }
-            }
-            newTaskList.push(task);
-        });
-
-        if (hasChanges) {
-            this.saveTasks(newTaskList);
-        }
-        return newTaskList;
+    // --- TRAVA DE SEGURANÇA ---
+    // Verifica se já existe um carimbo dizendo que rodamos hoje
+    const lastRun = localStorage.getItem('last_recurring_run');
+    
+    // Se a data salva for igual a hoje, PARE TUDO.
+    if (lastRun === today) {
+        console.log('Verificação diária já foi feita hoje. Pulando...');
+        return this.getTasks(); 
     }
-};
+    // ---------------------------
+
+    const tasks = this.getTasks();
+    let hasChanges = false;
+    const newTaskList = [];
+
+    tasks.forEach(task => {
+        if (task.isRecurring && task.isCompleted && task.completedAt) {
+            const completionDate = task.completedAt.split('T')[0];
+            
+            if (completionDate < today) {
+                hasChanges = true;
+                
+                // 1. Arquiva a antiga
+                newTaskList.push({ ...task, isRecurring: false });
+
+                // 2. Cria a nova
+                newTaskList.push({
+                    ...task,
+                    id: crypto.randomUUID(),
+                    isCompleted: false,
+                    completedAt: null,
+                    createdAt: new Date().toISOString(),
+                    dueDate: new Date().toISOString(),
+                    isRecurring: true
+                });
+                return;
+            }
+        }
+        newTaskList.push(task);
+    });
+
+    if (hasChanges) {
+        this.saveTasks(newTaskList);
+        
+        // --- ATIVAR A TRAVA ---
+        // Salva no navegador que hoje (today) já rodamos o processo
+        localStorage.setItem('last_recurring_run', today); 
+        
+        // Se você tiver uma função que desenha a tela, chame ela aqui apenas UMA vez
+        // ex: renderApp(); 
+    }
+    
+    return newTaskList;
+}}
