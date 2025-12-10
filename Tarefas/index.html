@@ -1,212 +1,264 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>André Lessa - Tarefas</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Tarefas Pro</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#fef2f2',
+                            100: '#fee2e2',
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            700: '#b91c1c',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Configurações Mobile -->
-  <meta name="theme-color" content="#ffffff">
-  <meta name="mobile-web-app-capable" content="yes">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
 
-  <!-- Estilos Externos -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
-  
-  <link href="css/style.css" rel="stylesheet" />
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Import Map apenas para Gemini SDK (React removido) -->
+    <script type="importmap">
+    {
+      "imports": {
+        "@google/genai": "https://esm.run/@google/genai"
+      }
+    }
+    </script>
+<link rel="stylesheet" href="/index.css">
 </head>
-<body class="bg-slate-50 text-slate-900 antialiased select-none font-sans overflow-hidden h-screen flex flex-col md:flex-row">
+<body class="bg-slate-50 text-slate-900 font-sans h-screen flex overflow-hidden">
 
-  <!-- Sidebar -->
-  <aside class="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col">
-    <div class="p-6">
-      <div class="flex items-center gap-3 text-brand-600 font-bold text-xl">
-        <i class="fas fa-layer-group"></i>
-        <span>André Lessa</span>
-      </div>
-    </div>
-    <nav class="flex-1 px-4 space-y-2">
-      <button onclick="app.switchView('tasks')" 
-              class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors bg-brand-50 text-brand-700"
-              id="nav-tasks-desktop">
-        <i class="fas fa-check-circle w-5"></i> Tarefas
-      </button>
-      <button onclick="app.switchView('reports')" 
-              class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-slate-600 hover:bg-slate-50"
-              id="nav-reports-desktop">
-        <i class="fas fa-chart-pie w-5"></i> Relatórios
-      </button>
-    </nav>
-  </aside>
-
-  <!-- Conteúdo Principal -->
-  <main class="flex-1 overflow-auto p-4 md:p-8 pb-20 md:pb-8 pt-4 relative">
-
-    <!-- VIEW: TAREFAS -->
-    <div id="view-tasks" class="max-w-3xl mx-auto fade-in">
-      <div class="flex items-center justify-between mb-8">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col justify-between shrink-0 transition-all duration-300" id="sidebar">
         <div>
-          <h1 class="text-2xl font-bold text-slate-900">Minhas Tarefas</h1>
-          <p class="text-slate-500 text-sm">Gerencie sua produtividade diária</p>
+            <!-- Logo area -->
+            <div class="h-20 flex items-center px-6 border-b border-transparent">
+                <div class="flex items-center gap-3 text-red-600">
+                    <i data-lucide="layers" class="w-6 h-6"></i>
+                    <h1 class="text-xl font-bold tracking-tight text-gray-900">André Lessa</h1>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="px-4 py-6 space-y-1">
+                <button id="nav-tasks" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors bg-red-50 text-red-600">
+                    <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+                    Tarefas
+                </button>
+                <button id="nav-reports" class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors text-gray-500 hover:bg-gray-50 hover:text-gray-900">
+                    <i data-lucide="pie-chart" class="w-5 h-5"></i>
+                    Relatórios
+                </button>
+            </nav>
         </div>
-        <button onclick="app.toggleAddForm()" 
-                class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-md hover:shadow-lg">
-          <i class="fas fa-plus"></i> Nova Tarefa
-        </button>
-      </div>
 
-      <!-- Formulário de Adicionar -->
-      <div id="add-form-container" class="hidden bg-white p-6 rounded-2xl shadow-lg border border-brand-100 mb-8 slide-down">
-        <form id="add-task-form">
-          <div class="mb-4">
-            <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Título</label>
-            <input type="text" id="new-task-title" required placeholder="O que precisa ser feito?"
-                   class="w-full px-4 py-2 rounded-lg border border-slate-200 focus:border-brand-500 outline-none">
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <!-- Sidebar Footer -->
+        <div class="px-4 py-6 space-y-6">
             <div>
-              <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Prioridade</label>
-              <select id="new-task-priority" class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none">
-                <option value="Média">Média</option>
-                <option value="Alta">Alta</option>
-                <option value="Baixa">Baixa</option>
-              </select>
+                <h4 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Nuvem</h4>
+                <button class="w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
+                    <i data-lucide="plug" class="w-4 h-4"></i>
+                    Conectar Drive
+                </button>
             </div>
+            
             <div>
-              <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Categoria</label>
-              <select id="new-task-category" class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none">
-                <option value="Trabalho">Trabalho</option>
-                <option value="Estudos">Estudos</option>
-                <option value="Saúde">Saúde</option>
-                <option value="Pessoal">Pessoal</option>
-              </select>
+                <h4 class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Dados Locais</h4>
+                <div class="space-y-1">
+                    <button class="w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        Baixar Arquivo
+                    </button>
+                    <button class="w-full flex items-center gap-3 px-4 py-2 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-50 transition-colors">
+                        <i data-lucide="upload" class="w-4 h-4"></i>
+                        Ler Arquivo
+                    </button>
+                </div>
             </div>
-            <div>
-              <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Data</label>
-              <input type="date" id="new-task-date" class="w-full px-4 py-2 rounded-lg border border-slate-200 outline-none">
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col overflow-hidden relative">
+        
+        <!-- Top Header -->
+        <header class="bg-transparent px-8 py-8 shrink-0">
+            <div id="view-header-tasks" class="flex justify-between items-start">
+                <div>
+                    <h2 class="text-3xl font-bold text-slate-900">Minhas Tarefas</h2>
+                    <p class="text-slate-500 mt-1">Gerencie sua produtividade diária</p>
+                </div>
+                <button id="btn-add-task" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-lg font-medium shadow-sm hover:shadow-md transition-all flex items-center gap-2">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    Nova Tarefa
+                </button>
             </div>
-          </div>
-
-          <div class="mb-6 flex items-center">
-            <input type="checkbox" id="new-task-recurring" class="w-4 h-4 text-brand-600 rounded">
-            <label for="new-task-recurring" class="ml-2 text-sm text-slate-700 font-medium cursor-pointer flex items-center gap-2">
-              <i class="fas fa-sync-alt text-slate-400 text-xs"></i> Repetir diariamente
-            </label>
-          </div>
-
-          <div class="flex justify-end gap-2">
-            <button type="button" onclick="app.toggleAddForm()" class="px-4 py-2 text-slate-500 font-medium">Cancelar</button>
-            <button type="submit" class="px-6 py-2 bg-brand-600 text-white rounded-lg font-medium shadow-md">Criar Tarefa</button>
-          </div>
-        </form>
-      </div>
-
-      <!-- Filtros -->
-      <div class="flex gap-2 mb-6">
-        <button onclick="app.filterTasks('all')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium bg-slate-900 text-white" data-filter="all">Todas</button>
-        <button onclick="app.filterTasks('active')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium bg-white text-slate-600 border border-slate-200" data-filter="active">Pendentes</button>
-        <button onclick="app.filterTasks('completed')" class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium bg-white text-slate-600 border border-slate-200" data-filter="completed">Concluídas</button>
-      </div>
-
-      <!-- Lista de Tarefas -->
-      <div id="task-list-container" class="space-y-3 pb-20"></div>
-    </div>
-
-    <!-- VIEW: RELATÓRIOS -->
-    <div id="view-reports" class="hidden max-w-4xl mx-auto fade-in pb-20">
-      <div class="flex items-center justify-between mb-8">
-        <div>
-          <h1 class="text-2xl font-bold text-slate-900">Análises</h1>
-          <p class="text-slate-500 text-sm">Visualize seu desempenho</p>
-        </div>
-        <div class="bg-white p-1 rounded-lg border border-slate-200 shadow-sm flex">
-          <button onclick="app.changeReportPeriod('Weekly')" class="report-period-btn px-4 py-1.5 text-sm font-medium rounded-md bg-brand-50 text-brand-700" data-period="Weekly">Semanal</button>
-          <button onclick="app.changeReportPeriod('Monthly')" class="report-period-btn px-4 py-1.5 text-sm font-medium rounded-md text-slate-500" data-period="Monthly">Mensal</button>
-          <button onclick="app.changeReportPeriod('Annual')" class="report-period-btn px-4 py-1.5 text-sm font-medium rounded-md text-slate-500" data-period="Annual">Anual</button>
-        </div>
-      </div>
-
-      <!-- KPIs -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-          <p class="text-xs font-semibold text-slate-500 uppercase">Total</p>
-          <p class="text-3xl font-bold text-slate-900 mt-2" id="kpi-total">0</p>
-        </div>
-                <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-          <p class="text-xs font-semibold text-slate-500 uppercase">Feitas</p>
-          <p class="text-3xl font-bold text-emerald-600 mt-2" id="kpi-completed">0</p>
-        </div>
-        <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-          <p class="text-xs font-semibold text-slate-500 uppercase">Taxa</p>
-          <p class="text-3xl font-bold text-brand-600 mt-2" id="kpi-rate">0%</p>
-        </div>
-        <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-          <p class="text-xs font-semibold text-slate-500 uppercase">Alta Prio.</p>
-          <p class="text-3xl font-bold text-indigo-600 mt-2" id="kpi-high">0</p>
-        </div>
-      </div>
-
-      <!-- Gráficos -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-          <h3 class="text-lg font-bold text-slate-800 mb-4">Por Categoria</h3>
-          <canvas id="chart-categories"></canvas>
-        </div>
-        <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-          <h3 class="text-lg font-bold text-slate-800 mb-4">Atividade Diária</h3>
-          <canvas id="chart-daily"></canvas>
-        </div>
-      </div>
-
-      <!-- Relatório por Categoria -->
-      <div id="category-report" class="mt-4 p-4 bg-white rounded-lg shadow-sm border border-slate-200"></div>
-
-      <!-- Área IA -->
-      <div class="bg-gradient-to-br from-brand-900 to-indigo-900 rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
-        <div class="absolute top-0 right-0 p-32 bg-white opacity-5 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
-        <div class="relative z-10">
-          <div class="flex items-center justify-between mb-6">
-            <div class="flex items-center gap-3">
-              <i class="fas fa-robot text-brand-200 text-2xl"></i>
-              <div>
-                <h2 class="text-xl font-bold">Relatório Gemini AI</h2>
-                <p class="text-brand-200 text-sm">Análise inteligente de produtividade</p>
-              </div>
+            <div id="view-header-reports" class="hidden">
+                <h2 class="text-3xl font-bold text-slate-900">Relatórios Inteligentes</h2>
+                <p class="text-slate-500 mt-1">Insights gerados por IA sobre seu desempenho</p>
             </div>
-            <button onclick="app.generateAI()" id="btn-ai-generate"
-                    class="px-6 py-2 bg-white text-brand-900 rounded-lg font-semibold hover:bg-brand-50 transition-colors flex items-center gap-2">
-              <i class="fas fa-magic"></i> Gerar Relatório
-            </button>
-          </div>
-          <div id="ai-result"
-               class="prose prose-invert prose-sm max-w-none bg-white/10 p-6 rounded-xl border border-white/10 min-h-[100px]">
-            <p class="text-brand-100 text-center italic">Clique em gerar para receber sua análise.</p>
-          </div>
+        </header>
+
+        <!-- Filters (Only visible in Tasks view) -->
+        <div id="task-filters" class="px-8 pb-6 flex gap-3">
+            <button class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium bg-slate-900 text-white transition-all shadow-sm" data-filter="ALL">Todas</button>
+            <button class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium bg-white text-slate-500 border border-gray-200 hover:border-gray-300 transition-all" data-filter="PENDING">Pendentes</button>
+            <button class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium bg-white text-slate-500 border border-gray-200 hover:border-gray-300 transition-all" data-filter="COMPLETED">Concluídas</button>
         </div>
-      </div>
-    </div>
-  </main>
 
-  <!-- Mobile Nav -->
-  <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 flex justify-around p-3">
-    <button onclick="app.switchView('tasks')" class="flex flex-col items-center text-brand-600" id="nav-tasks-mobile">
-      <i class="fas fa-check-circle text-xl mb-1"></i>
-      <span class="text-[10px] font-medium">Tarefas</span>
-    </button>
-    <button onclick="app.switchView('reports')" class="flex flex-col items-center text-slate-400" id="nav-reports-mobile">
-      <i class="fas fa-chart-pie text-xl mb-1"></i>
-      <span class="text-[10px] font-medium">Relatórios</span>
-    </button>
-  </div>
+        <!-- Scrollable Content Area -->
+        <div class="flex-1 overflow-y-auto px-8 pb-10 custom-scrollbar">
+            
+            <!-- View: Tarefas -->
+            <div id="view-tasks" class="animate-fade-in max-w-5xl">
+                
+                <!-- Form Container (Hidden by default) -->
+                <div id="task-form-container" class="hidden bg-white p-6 rounded-2xl shadow-lg border border-gray-100 mb-8 animate-fade-in relative z-20">
+                    <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
+                        <h2 class="text-lg font-bold text-gray-800" id="form-title">Nova Tarefa</h2>
+                        <button id="btn-cancel-form" class="text-gray-400 hover:text-gray-600">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                    <form id="task-form" class="space-y-5">
+                        <input type="hidden" id="task-id">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Título</label>
+                            <input type="text" id="task-title" required class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:bg-white outline-none transition-all" placeholder="Ex: Finalizar relatório mensal">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Descrição</label>
+                            <textarea id="task-desc" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:bg-white outline-none resize-none h-28 transition-all" placeholder="Adicione detalhes..."></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Prioridade</label>
+                            <div class="flex gap-3">
+                                <button type="button" class="priority-btn flex-1 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-all" data-value="LOW">Baixa</button>
+                                <button type="button" class="priority-btn flex-1 py-2.5 px-4 rounded-lg text-sm font-medium border-yellow-200 bg-yellow-50 text-yellow-700 ring-1 ring-yellow-500 transition-all shadow-sm" data-value="MEDIUM">Média</button>
+                                <button type="button" class="priority-btn flex-1 py-2.5 px-4 rounded-lg text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-all" data-value="HIGH">Alta</button>
+                            </div>
+                            <input type="hidden" id="task-priority" value="MEDIUM">
+                        </div>
+                        <div class="flex justify-end gap-3 pt-4">
+                            <button type="button" id="btn-cancel-form-2" class="px-5 py-2.5 text-gray-500 hover:bg-gray-100 rounded-lg font-medium transition-colors">Cancelar</button>
+                            <button type="submit" class="bg-red-600 text-white px-6 py-2.5 rounded-lg hover:bg-red-700 flex items-center gap-2 font-medium shadow-md transition-all">
+                                <i data-lucide="save" class="w-4 h-4"></i>
+                                Salvar Tarefa
+                            </button>
+                        </div>
+                    </form>
+                </div>
 
-  <!-- Scripts -->
-  <script type="module" src="js/storage.js"></script>
-<script type="module" src="js/gemini.js"></script>
-<script type="module" src="js/drive.js"></script>
-<script type="module" src="js/app.js"></script>
+                <!-- Task List -->
+                <div id="task-list" class="space-y-3">
+                    <!-- Tasks will be injected here -->
+                </div>
+                
+                <!-- Empty State -->
+                <div id="empty-state" class="hidden flex flex-col items-center justify-center py-24 text-center">
+                    <div class="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mb-6 text-gray-400">
+                        <i data-lucide="clipboard-list" class="w-10 h-10"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900">Nenhuma tarefa encontrada.</h3>
+                    <p class="text-gray-500 mt-2 max-w-sm mx-auto">Suas tarefas aparecerão aqui. Clique em "Nova Tarefa" para começar a se organizar.</p>
+                </div>
+            </div>
+
+            <!-- View: Relatórios -->
+            <div id="view-reports" class="hidden space-y-8 animate-fade-in max-w-5xl">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Chart Card -->
+                    <div class="bg-white p-8 rounded-3xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-bold text-gray-800">Desempenho Visual</h3>
+                            <span class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                                <i data-lucide="pie-chart" class="w-5 h-5"></i>
+                            </span>
+                        </div>
+                        <div class="relative h-64 w-full flex items-center justify-center">
+                            <canvas id="tasksChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- AI Card -->
+                    <div class="bg-gradient-to-br from-indigo-600 to-purple-700 p-8 rounded-3xl shadow-lg text-white flex flex-col relative overflow-hidden">
+                        <!-- Decorative shapes -->
+                        <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-white opacity-10 blur-3xl"></div>
+                        <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 rounded-full bg-white opacity-10 blur-2xl"></div>
+                        
+                        <div class="relative z-10 flex-grow">
+                            <h3 class="text-2xl font-bold mb-2 flex items-center gap-2">
+                                <i data-lucide="sparkles" class="w-6 h-6 text-yellow-300"></i>
+                                Assistente IA
+                            </h3>
+                            <p class="text-indigo-100 mb-8 leading-relaxed opacity-90">
+                                Gere um diário de produtividade detalhado analisando seus dados. Ideal para acompanhar seu progresso semanal ou mensal.
+                            </p>
+                            
+                            <div class="flex gap-3 mb-6 bg-white/10 p-1.5 rounded-xl backdrop-blur-sm">
+                                <button class="period-btn flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all bg-white text-indigo-700 shadow-sm" data-value="Weekly">Semanal</button>
+                                <button class="period-btn flex-1 py-2.5 rounded-lg text-sm font-medium text-indigo-100 hover:bg-white/10 transition-all" data-value="Monthly">Mensal</button>
+                            </div>
+                        </div>
+
+                        <button id="btn-generate-report" class="relative z-10 w-full bg-white text-indigo-700 px-6 py-3.5 rounded-xl font-bold hover:bg-indigo-50 transition-all flex items-center justify-center gap-2 shadow-lg group">
+                            <span>Gerar Relatório Agora</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Report Result -->
+                <div id="report-result" class="hidden bg-white p-8 rounded-3xl shadow-lg border border-indigo-100 relative">
+                    <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-6">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+                                <i data-lucide="file-text" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900">Resultado da Análise</h3>
+                                <p class="text-sm text-gray-500">Gerado via Gemini AI</p>
+                            </div>
+                        </div>
+                        <button id="btn-download-report" class="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 text-sm font-medium text-gray-700 transition-colors">
+                            <i data-lucide="download" class="w-4 h-4"></i>
+                            Exportar TXT
+                        </button>
+                    </div>
+                    <div id="report-content" class="prose prose-slate max-w-none text-gray-600 whitespace-pre-wrap leading-relaxed"></div>
+                </div>
+            </div>
+            
+            <footer class="mt-12 text-center text-gray-300 text-xs pb-4">
+                <p>&copy; 2025 Gestor Pro. Powered by Google Gemini.</p>
+            </footer>
+
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script type="module" src="js/app.js"></script>
+<script type="module" src="/index.tsx"></script>
 </body>
 </html>

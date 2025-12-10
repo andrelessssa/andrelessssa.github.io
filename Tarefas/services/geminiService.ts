@@ -1,0 +1,1 @@
+// Arquivo removido. A lógica de API foi movida para js/api.js.

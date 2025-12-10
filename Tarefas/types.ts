@@ -1,0 +1,1 @@
+// Arquivo removido. O projeto agora utiliza index.html e js/app.js para funcionar sem React.
