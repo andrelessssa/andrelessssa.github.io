@@ -1277,55 +1277,84 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   </div> 
 </div> 
  
-<script> 
-function navigate(page) { 
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
-  document.getElementById('screen-' + page).classList.add('active'); 
-  window.scrollTo(0, 0); 
-} 
- 
-// Live clock on TV preview 
-function updateClock() { 
-  const el = document.getElementById('tv-clock'); 
-  if (el) { 
-    const now = new Date(); 
-    const h = String(now.getHours()).padStart(2,'0'); 
-    const m = String(now.getMinutes()).padStart(2,'0'); 
-    el.textContent = h + ':' + m; 
-  } 
-} 
-updateClock(); 
-setInterval(updateClock, 30000); 
-
+<script>
+// 1. Definições de elementos
 const menuToggle = document.getElementById('menu-toggle');
 const sidebar = document.querySelector('.sidebar');
 
+/**
+ * 2. Função Única de Navegação
+ * Gerencia a troca de telas e o comportamento do menu
+ */
 function navigate(pageId) {
-    // 1. Esconde todas as telas e ativa a correta [cite: 1208-1209]
+    // Esconde todas as telas e ativa a correta [cite: 1208-1209]
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('screen-' + pageId).classList.add('active');
-
-    // 2. Controla o botão hambúrguer: some no login, aparece nas outras
-    if (pageId === 'login') {
-        menuToggle.style.setProperty('display', 'none', 'important');
-    } else {
-        // O CSS mobile-only cuidará de mostrar apenas no celular
-        menuToggle.style.setProperty('display', '', ''); 
+    const target = document.getElementById('screen-' + pageId);
+    if (target) {
+        target.classList.add('active');
     }
 
-    // 3. Fecha o menu lateral no mobile após o clique
-    sidebar.classList.remove('open');
+    // Controle do botão hambúrguer: esconde no login e mostra nas outras 
+    if (menuToggle) {
+        if (pageId === 'login') {
+            menuToggle.style.setProperty('display', 'none', 'important');
+        } else {
+            // O CSS 'mobile-only' volta a controlar a visibilidade no celular
+            menuToggle.style.setProperty('display', '', ''); 
+        }
+    }
+
+    // Fecha o menu lateral automaticamente após o clique no mobile
+    if (sidebar) {
+        sidebar.classList.remove('open');
+    }
     
-    window.scrollTo(0, 0); [cite, 1210]
+    // Retorna ao topo da página [cite: 1210]
+    window.scrollTo(0, 0);
 }
 
-// Abre/Fecha o menu ao clicar no ☰
-menuToggle.addEventListener('click', (e) => {
-    e.stopPropagation();
-    sidebar.classList.toggle('open');
+/**
+ * 3. Evento do Menu Hambúrguer
+ * Abre/Fecha o menu ao clicar no ☰
+ */
+if (menuToggle) {
+    menuToggle.addEventListener('click', (e) => {
+        e.stopPropagation(); // Impede que o clique feche o menu imediatamente
+        if (sidebar) {
+            sidebar.classList.toggle('open');
+        }
+    });
+}
 
+/**
+ * 4. Relógio em tempo real na Prévia da TV
+ */
+function updateClock() {
+    const el = document.getElementById('tv-clock'); [cite, 1213-1215]
+    if (el) {
+        const now = new Date(); [cite, 1216]
+        const h = String(now.getHours()).padStart(2, '0'); [cite, 1217]
+        const m = String(now.getMinutes()).padStart(2, '0'); [cite, 1218]
+        el.textContent = h + ':' + m; [cite, 1219]
+    }
+}
+
+// Inicia o relógio e define a atualização a cada 30 segundos [cite: 1222-1223]
+updateClock();
+setInterval(updateClock, 30000);
+
+/**
+ * 5. Fechamento de segurança
+ * Fecha o menu se clicar em qualquer lugar fora dele
+ */
+document.addEventListener('click', (e) => {
+    if (sidebar && sidebar.classList.contains('open')) {
+        if (!sidebar.contains(e.target) && e.target !== menuToggle) {
+            sidebar.classList.remove('open');
+        }
+    }
 });
-</script> 
+</script>
 </body> 
 </html> 
 
