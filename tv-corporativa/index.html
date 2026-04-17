@@ -757,55 +757,12 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 
 /* REGRAS PARA CELULAR - AJUSTADO */
 @media (max-width: 768px) {
-    /* Ajusta o container pai para empilhar os itens */
-    body {
-        display: block !important; 
-        overflow-y: auto !important;
-    }
-
-    /* Sidebar vira um cabeçalho no topo */
-    .sidebar {
-        width: 100% !important;
-        height: auto !important;
-        position: relative !important;
-        padding: 15px !important;
-        border-right: none !important;
-        border-bottom: 1px solid var(--border2) !important;
-    }
-
-    /* Esconde as etiquetas do menu para caber tudo em uma linha ou grade */
-    .nav-label, .sidebar-bottom { display: none !important; }
-    
-    .sidebar-logo { margin-bottom: 15px !important; justify-content: center; }
-
-    /* As telas agora aparecem logo abaixo do menu */
-    .main {
-        padding: 20px !important;
-        width: 100% !important;
-    }
-
-    /* Garante que a tela ativa apareça e flua corretamente */
-    .screen.active {
-        display: block !important; 
-        min-height: auto !important;
-    }
-
-    /* Cards de estatística um embaixo do outro */
-    .stats-row {
-        grid-template-columns: 1fr !important;
-    }
-}
-
-/* Esconde o botão no computador */
-.mobile-only { display: none; }
-
-@media (max-width: 768px) {
     .mobile-only {
-        display: block;
+        display: block !important;
         position: fixed;
         top: 20px;
-        right: 20px;
-        z-index: 1000;
+        left: 20px; /* Movido para a esquerda */
+        z-index: 1001; /* Fica acima de tudo */
         background: var(--indigo);
         border: none;
         color: white;
@@ -815,34 +772,34 @@ tr:hover td { background: rgba(255,255,255,0.02); }
         cursor: pointer;
     }
 
-    /* Sidebar vira um menu flutuante que começa escondido */
+    /* Esconde o botão especificamente na tela de login */
+    #screen-login.active ~ #menu-toggle,
+    body:has(#screen-login.active) #menu-toggle {
+        display: none !important;
+    }
+
     .sidebar {
         position: fixed !important;
-        left: -100% !important; /* Escondido à esquerda */
+        left: -100% !important;
         top: 0;
         width: 80% !important;
         height: 100vh !important;
-        z-index: 999;
-        transition: 0.3s;
+        z-index: 1000;
+        transition: 0.3s ease-in-out;
         background: var(--surface) !important;
-        box-shadow: 10px 0 30px rgba(0,0,0,0.5);
     }
 
-    /* Classe que o JS vai ativar para abrir o menu */
     .sidebar.open {
         left: 0 !important;
     }
 
-    /* Faz o conteúdo ocupar a tela toda no celular */
-    .main-content {
-        width: 100% !important;
-        padding-top: 80px !important;
-    }
 }
 
 </style> 
 </head> 
 <body> 
+
+    <button id="menu-toggle" class="mobile-only" style="display: none;"> ☰ </button>
  
 <!-- ==================== LOGIN ==================== --> 
 <div id="screen-login" class="screen active"> 
@@ -1003,7 +960,7 @@ tr:hover td { background: rgba(255,255,255,0.02); }
   </main> 
 </div> 
 
-<button id="menu-toggle" class="mobile-only"> ☰ </button>
+
  
 <!-- ==================== VIDEOS ==================== --> 
 <div id="screen-videos" class="screen"> 
@@ -1340,21 +1297,33 @@ function updateClock() {
 updateClock(); 
 setInterval(updateClock, 30000); 
 
-// Lógica para abrir/fechar o Menu Hambúrguer
 const menuToggle = document.getElementById('menu-toggle');
 const sidebar = document.querySelector('.sidebar');
 
-menuToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
-});
+function navigate(pageId) {
+    // 1. Esconde todas as telas e ativa a correta [cite: 1208-1209]
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + pageId).classList.add('active');
 
-// Fecha o menu automaticamente quando clicar em um item (Vídeos, etc)
-document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', () => {
-        if (window.innerWidth <= 768) {
-            sidebar.classList.remove('open');
-        }
-    });
+    // 2. Controla o botão hambúrguer: some no login, aparece nas outras
+    if (pageId === 'login') {
+        menuToggle.style.setProperty('display', 'none', 'important');
+    } else {
+        // O CSS mobile-only cuidará de mostrar apenas no celular
+        menuToggle.style.setProperty('display', '', ''); 
+    }
+
+    // 3. Fecha o menu lateral no mobile após o clique
+    sidebar.classList.remove('open');
+    
+    window.scrollTo(0, 0); [cite, 1210]
+}
+
+// Abre/Fecha o menu ao clicar no ☰
+menuToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sidebar.classList.toggle('open');
+
 });
 </script> 
 </body> 
