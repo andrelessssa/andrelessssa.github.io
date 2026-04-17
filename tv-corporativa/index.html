@@ -796,6 +796,50 @@ tr:hover td { background: rgba(255,255,255,0.02); }
     }
 }
 
+/* Esconde o botão no computador */
+.mobile-only { display: none; }
+
+@media (max-width: 768px) {
+    .mobile-only {
+        display: block;
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        background: var(--indigo);
+        border: none;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    /* Sidebar vira um menu flutuante que começa escondido */
+    .sidebar {
+        position: fixed !important;
+        left: -100% !important; /* Escondido à esquerda */
+        top: 0;
+        width: 80% !important;
+        height: 100vh !important;
+        z-index: 999;
+        transition: 0.3s;
+        background: var(--surface) !important;
+        box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+    }
+
+    /* Classe que o JS vai ativar para abrir o menu */
+    .sidebar.open {
+        left: 0 !important;
+    }
+
+    /* Faz o conteúdo ocupar a tela toda no celular */
+    .main-content {
+        width: 100% !important;
+        padding-top: 80px !important;
+    }
+}
+
 </style> 
 </head> 
 <body> 
@@ -958,6 +1002,8 @@ tr:hover td { background: rgba(255,255,255,0.02); }
     </div> 
   </main> 
 </div> 
+
+<button id="menu-toggle" class="mobile-only"> ☰ </button>
  
 <!-- ==================== VIDEOS ==================== --> 
 <div id="screen-videos" class="screen"> 
@@ -1293,6 +1339,23 @@ function updateClock() {
 } 
 updateClock(); 
 setInterval(updateClock, 30000); 
+
+// Lógica para abrir/fechar o Menu Hambúrguer
+const menuToggle = document.getElementById('menu-toggle');
+const sidebar = document.querySelector('.sidebar');
+
+menuToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+});
+
+// Fecha o menu automaticamente quando clicar em um item (Vídeos, etc)
+document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+            sidebar.classList.remove('open');
+        }
+    });
+});
 </script> 
 </body> 
 </html> 
