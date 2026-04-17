@@ -755,35 +755,44 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 ::-webkit-scrollbar-track { background: transparent; } 
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; } 
 
-/* REGRAS PARA CELULAR */
+/* REGRAS PARA CELULAR - AJUSTADO */
 @media (max-width: 768px) {
-    #screen-dashboard.active, 
-    #screen-videos.active, 
-    #screen-devices.active {
-        display: flex !important;
-        flex-direction: column !important; /* Joga o conteúdo para baixo da sidebar */
+    /* Ajusta o container pai para empilhar os itens */
+    body {
+        display: block !important; 
+        overflow-y: auto !important;
     }
 
+    /* Sidebar vira um cabeçalho no topo */
     .sidebar {
         width: 100% !important;
         height: auto !important;
+        position: relative !important;
         padding: 15px !important;
         border-right: none !important;
         border-bottom: 1px solid var(--border2) !important;
     }
 
+    /* Esconde as etiquetas do menu para caber tudo em uma linha ou grade */
+    .nav-label, .sidebar-bottom { display: none !important; }
+    
+    .sidebar-logo { margin-bottom: 15px !important; justify-content: center; }
+
+    /* As telas agora aparecem logo abaixo do menu */
     .main {
         padding: 20px !important;
         width: 100% !important;
     }
 
-    .stats-row {
-        grid-template-columns: 1fr !important; /* Cards um embaixo do outro */
+    /* Garante que a tela ativa apareça e flua corretamente */
+    .screen.active {
+        display: block !important; 
+        min-height: auto !important;
     }
 
-    .login-card {
-        width: 90% !important; /* Card de login não vaza da tela */
-        padding: 25px !important;
+    /* Cards de estatística um embaixo do outro */
+    .stats-row {
+        grid-template-columns: 1fr !important;
     }
 }
 
