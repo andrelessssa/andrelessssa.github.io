@@ -754,6 +754,39 @@ tr:hover td { background: rgba(255,255,255,0.02); }
 ::-webkit-scrollbar { width: 5px; } 
 ::-webkit-scrollbar-track { background: transparent; } 
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; } 
+
+/* REGRAS PARA CELULAR */
+@media (max-width: 768px) {
+    #screen-dashboard.active, 
+    #screen-videos.active, 
+    #screen-devices.active {
+        display: flex !important;
+        flex-direction: column !important; /* Joga o conteúdo para baixo da sidebar */
+    }
+
+    .sidebar {
+        width: 100% !important;
+        height: auto !important;
+        padding: 15px !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--border2) !important;
+    }
+
+    .main {
+        padding: 20px !important;
+        width: 100% !important;
+    }
+
+    .stats-row {
+        grid-template-columns: 1fr !important; /* Cards um embaixo do outro */
+    }
+
+    .login-card {
+        width: 90% !important; /* Card de login não vaza da tela */
+        padding: 25px !important;
+    }
+}
+
 </style> 
 </head> 
 <body> 
