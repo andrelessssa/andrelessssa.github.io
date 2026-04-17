@@ -1,0 +1,1257 @@
+<!DOCTYPE html> 
+<html lang="pt-BR"> 
+<head> 
+<meta charset="UTF-8"> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+<title>Arsal — TV Corporativa</title> 
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"> 
+<style> 
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; } 
+ 
+:root { 
+  --bg: #0a0a0f; 
+  --surface: #0f0f1a; 
+  --surface2: rgba(255,255,255,0.04); 
+  --border: rgba(255,255,255,0.07); 
+  --border2: rgba(255,255,255,0.12); 
+  --text: #f1f1f5; 
+  --muted: rgba(255,255,255,0.38); 
+  --indigo: #818cf8; 
+  --violet: #a78bfa; 
+  --pink: #e879f9; 
+  --green: #34d399; 
+  --orange: #fb923c; 
+  --cyan: #38bdf8; 
+  --red: #f87171; 
+} 
+ 
+body { 
+  font-family: 'DM Sans', sans-serif; 
+  background: var(--bg); 
+  color: var(--text); 
+  min-height: 100vh; 
+  overflow-x: hidden; 
+} 
+ 
+/* SCREENS */ 
+.screen { display: none; min-height: 100vh; } 
+.screen.active { display: flex; } 
+ 
+/* ===================== LOGIN ===================== */ 
+#screen-login { 
+  align-items: center; 
+  justify-content: center; 
+  position: relative; 
+  overflow: hidden; 
+} 
+.login-bg { 
+  position: absolute; inset: 0; 
+  background: 
+    radial-gradient(ellipse 600px 500px at 20% 50%, rgba(129,140,248,0.12) 0%, transparent 70%), 
+    radial-gradient(ellipse 500px 400px at 80% 50%, rgba(232,121,249,0.08) 0%, transparent 70%); 
+} 
+.login-grid { 
+  position: absolute; inset: 0; 
+  background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), 
+                    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px); 
+  background-size: 60px 60px; 
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%); 
+} 
+.login-card { 
+  position: relative; 
+  width: 420px; 
+  background: rgba(15,15,26,0.9); 
+  border: 1px solid var(--border2); 
+  border-radius: 24px; 
+  padding: 44px 40px; 
+  backdrop-filter: blur(20px); 
+  box-shadow: 0 40px 100px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04); 
+  animation: fadeUp 0.6s ease both; 
+} 
+@keyframes fadeUp { 
+  from { opacity: 0; transform: translateY(24px); } 
+  to { opacity: 1; transform: translateY(0); } 
+} 
+.logo { 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+  margin-bottom: 32px; 
+} 
+.logo-icon { 
+  width: 38px; height: 38px; 
+  background: linear-gradient(135deg, var(--indigo), var(--pink)); 
+  border-radius: 10px; 
+  display: flex; align-items: center; justify-content: center; 
+  font-size: 18px; 
+} 
+.logo-text { 
+  font-family: 'Syne', sans-serif; 
+  font-size: 22px; 
+  font-weight: 800; 
+  background: linear-gradient(90deg, var(--indigo), var(--pink)); 
+  -webkit-background-clip: text; 
+  -webkit-text-fill-color: transparent; 
+  background-clip: text; 
+} 
+.login-title { 
+  font-family: 'Syne', sans-serif; 
+  font-size: 26px; 
+  font-weight: 700; 
+  color: #fff; 
+  margin-bottom: 6px; 
+} 
+.login-sub { 
+  font-size: 13px; 
+  color: var(--muted); 
+  font-weight: 300; 
+  margin-bottom: 28px; 
+} 
+.field { 
+  margin-bottom: 16px; 
+} 
+.field label { 
+  display: block; 
+  font-size: 12px; 
+  font-weight: 500; 
+  color: rgba(255,255,255,0.5); 
+  letter-spacing: 0.06em; 
+  text-transform: uppercase; 
+  margin-bottom: 8px; 
+} 
+.field input { 
+  width: 100%; 
+  background: rgba(255,255,255,0.04); 
+  border: 1px solid var(--border2); 
+  border-radius: 12px; 
+  padding: 13px 16px; 
+  font-family: 'DM Sans', sans-serif; 
+  font-size: 14px; 
+  color: var(--text); 
+  outline: none; 
+  transition: border-color 0.2s, box-shadow 0.2s; 
+} 
+.field input:focus { 
+  border-color: var(--indigo); 
+  box-shadow: 0 0 0 3px rgba(129,140,248,0.15); 
+} 
+.field input::placeholder { color: rgba(255,255,255,0.2); } 
+.btn-login { 
+  width: 100%; 
+  margin-top: 8px; 
+  padding: 14px; 
+  background: linear-gradient(135deg, var(--indigo), var(--pink)); 
+  border: none; 
+  border-radius: 12px; 
+  font-family: 'Syne', sans-serif; 
+  font-size: 15px; 
+  font-weight: 700; 
+  color: #fff; 
+  cursor: pointer; 
+  letter-spacing: 0.03em; 
+  transition: opacity 0.2s, transform 0.15s; 
+  box-shadow: 0 8px 30px rgba(129,140,248,0.3); 
+} 
+.btn-login:hover { opacity: 0.9; transform: translateY(-1px); } 
+.btn-login:active { transform: translateY(0); } 
+.login-footer { 
+  margin-top: 20px; 
+  text-align: center; 
+  font-size: 12px; 
+  color: var(--muted); 
+} 
+.login-footer a { color: var(--indigo); text-decoration: none; } 
+ 
+/* ===================== DASHBOARD LAYOUT ===================== */ 
+#screen-dashboard, #screen-videos, #screen-devices, #screen-preview { 
+  flex-direction: row; 
+} 
+.sidebar { 
+  width: 230px; 
+  min-height: 100vh; 
+  background: rgba(255,255,255,0.02); 
+  border-right: 1px solid var(--border); 
+  padding: 28px 16px; 
+  display: flex; 
+  flex-direction: column; 
+  flex-shrink: 0; 
+  position: sticky; 
+  top: 0; 
+  height: 100vh; 
+} 
+.sidebar-logo { 
+  display: flex; align-items: center; gap: 9px; 
+  padding: 0 8px; 
+  margin-bottom: 32px; 
+} 
+.sidebar-logo-icon { 
+  width: 32px; height: 32px; 
+  background: linear-gradient(135deg, var(--indigo), var(--pink)); 
+  border-radius: 8px; 
+  display: flex; align-items: center; justify-content: center; 
+  font-size: 15px; 
+  flex-shrink: 0; 
+} 
+.sidebar-logo-text { 
+  font-family: 'Syne', sans-serif; 
+  font-size: 17px; 
+  font-weight: 800; 
+  background: linear-gradient(90deg, var(--indigo), var(--pink)); 
+  -webkit-background-clip: text; 
+  -webkit-text-fill-color: transparent; 
+  background-clip: text; 
+} 
+.nav-label { 
+  font-size: 10px; 
+  font-weight: 600; 
+  letter-spacing: 0.12em; 
+  text-transform: uppercase; 
+  color: rgba(255,255,255,0.2); 
+  padding: 0 10px; 
+  margin-bottom: 6px; 
+  margin-top: 8px; 
+} 
+.nav-item { 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+  padding: 10px 12px; 
+  border-radius: 10px; 
+  font-size: 13.5px; 
+  font-weight: 400; 
+  color: rgba(255,255,255,0.45); 
+  cursor: pointer; 
+  transition: all 0.18s; 
+  margin-bottom: 2px; 
+  border: 1px solid transparent; 
+  user-select: none; 
+} 
+.nav-item:hover { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.7); } 
+.nav-item.active { 
+  background: rgba(129,140,248,0.12); 
+  color: var(--indigo); 
+  border-color: rgba(129,140,248,0.2); 
+  font-weight: 500; 
+} 
+.nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; } 
+.nav-badge { 
+  margin-left: auto; 
+  background: rgba(129,140,248,0.2); 
+  color: var(--indigo); 
+  font-size: 10px; 
+  font-weight: 600; 
+  padding: 2px 7px; 
+  border-radius: 100px; 
+} 
+.sidebar-bottom { 
+  margin-top: auto; 
+  border-top: 1px solid var(--border); 
+  padding-top: 16px; 
+} 
+.user-chip { 
+  display: flex; align-items: center; gap: 10px; 
+  padding: 10px 12px; 
+  border-radius: 10px; 
+  cursor: pointer; 
+  transition: background 0.18s; 
+} 
+.user-chip:hover { background: rgba(255,255,255,0.04); } 
+.avatar { 
+  width: 32px; height: 32px; 
+  border-radius: 50%; 
+  background: linear-gradient(135deg, var(--indigo), var(--pink)); 
+  display: flex; align-items: center; justify-content: center; 
+  font-size: 13px; 
+  font-weight: 700; 
+  color: #fff; 
+  flex-shrink: 0; 
+} 
+.user-info .user-name { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.75); } 
+.user-info .user-role { font-size: 11px; color: var(--muted); } 
+.logout-btn { 
+  margin-left: auto; 
+  background: none; 
+  border: none; 
+  color: var(--muted); 
+  cursor: pointer; 
+  font-size: 15px; 
+  padding: 4px; 
+  transition: color 0.2s; 
+} 
+.logout-btn:hover { color: var(--red); } 
+ 
+/* MAIN CONTENT */ 
+.main { 
+  flex: 1; 
+  min-height: 100vh; 
+  padding: 32px 36px; 
+  overflow-y: auto; 
+} 
+.page-header { 
+  display: flex; align-items: flex-start; justify-content: space-between; 
+  margin-bottom: 28px; 
+} 
+.page-title { 
+  font-family: 'Syne', sans-serif; 
+  font-size: 24px; 
+  font-weight: 800; 
+  color: #fff; 
+  letter-spacing: -0.02em; 
+} 
+.page-sub { font-size: 13px; color: var(--muted); margin-top: 3px; font-weight: 300; } 
+ 
+.btn { 
+  display: inline-flex; align-items: center; gap: 7px; 
+  padding: 10px 18px; 
+  border-radius: 10px; 
+  font-family: 'DM Sans', sans-serif; 
+  font-size: 13px; 
+  font-weight: 500; 
+  cursor: pointer; 
+  border: none; 
+  transition: all 0.18s; 
+} 
+.btn-primary { 
+  background: linear-gradient(135deg, var(--indigo), var(--violet)); 
+  color: #fff; 
+  box-shadow: 0 4px 20px rgba(129,140,248,0.25); 
+} 
+.btn-primary:hover { opacity: 0.9; transform: translateY(-1px); } 
+.btn-ghost { 
+  background: rgba(255,255,255,0.05); 
+  border: 1px solid var(--border2); 
+  color: rgba(255,255,255,0.6); 
+} 
+.btn-ghost:hover { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.9); } 
+ 
+/* STAT CARDS */ 
+.stats-row { 
+  display: grid; 
+  grid-template-columns: repeat(4, 1fr); 
+  gap: 14px; 
+  margin-bottom: 28px; 
+} 
+.stat-card { 
+  background: var(--surface2); 
+  border: 1px solid var(--border); 
+  border-radius: 16px; 
+  padding: 18px 20px; 
+  position: relative; 
+  overflow: hidden; 
+} 
+.stat-card::before { 
+  content: ''; 
+  position: absolute; 
+  top: -30px; right: -20px; 
+  width: 90px; height: 90px; 
+  border-radius: 50%; 
+  opacity: 0.08; 
+} 
+.stat-card.s1::before { background: var(--indigo); } 
+.stat-card.s2::before { background: var(--green); } 
+.stat-card.s3::before { background: var(--orange); } 
+.stat-card.s4::before { background: var(--cyan); } 
+.stat-icon { font-size: 20px; margin-bottom: 10px; } 
+.stat-value { 
+  font-family: 'Syne', sans-serif; 
+  font-size: 26px; 
+  font-weight: 800; 
+  color: #fff; 
+  line-height: 1; 
+} 
+.stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 300; } 
+.stat-change { 
+  margin-top: 8px; 
+  font-size: 11px; 
+  font-weight: 500; 
+  display: flex; align-items: center; gap: 4px; 
+} 
+.stat-change.up { color: var(--green); } 
+.stat-change.neutral { color: var(--muted); } 
+ 
+/* TABLES / LISTS */ 
+.section-card { 
+  background: var(--surface2); 
+  border: 1px solid var(--border); 
+  border-radius: 18px; 
+  overflow: hidden; 
+  margin-bottom: 20px; 
+} 
+.section-head { 
+  display: flex; align-items: center; justify-content: space-between; 
+  padding: 18px 22px 16px; 
+  border-bottom: 1px solid var(--border); 
+} 
+.section-title { 
+  font-family: 'Syne', sans-serif; 
+  font-size: 14px; 
+  font-weight: 700; 
+  color: rgba(255,255,255,0.8); 
+} 
+.search-box { 
+  display: flex; align-items: center; gap: 8px; 
+  background: rgba(255,255,255,0.04); 
+  border: 1px solid var(--border2); 
+  border-radius: 9px; 
+  padding: 7px 14px; 
+  font-size: 12.5px; 
+  color: var(--muted); 
+} 
+.search-box input { 
+  background: none; border: none; outline: none; 
+  font-family: 'DM Sans', sans-serif; 
+  font-size: 12.5px; 
+  color: var(--text); 
+  width: 160px; 
+} 
+.search-box input::placeholder { color: var(--muted); } 
+ 
+table { width: 100%; border-collapse: collapse; } 
+th { 
+  padding: 10px 20px; 
+  font-size: 11px; 
+  font-weight: 600; 
+  letter-spacing: 0.08em; 
+  text-transform: uppercase; 
+  color: var(--muted); 
+  text-align: left; 
+  border-bottom: 1px solid var(--border); 
+} 
+td { 
+  padding: 13px 20px; 
+  font-size: 13px; 
+  color: rgba(255,255,255,0.7); 
+  border-bottom: 1px solid rgba(255,255,255,0.04); 
+  vertical-align: middle; 
+} 
+tr:last-child td { border-bottom: none; } 
+tr:hover td { background: rgba(255,255,255,0.02); } 
+ 
+.thumb { 
+  width: 52px; height: 32px; 
+  border-radius: 6px; 
+  object-fit: cover; 
+  display: flex; align-items: center; justify-content: center; 
+  font-size: 18px; 
+  flex-shrink: 0; 
+} 
+.thumb-video { background: linear-gradient(135deg, rgba(129,140,248,0.3), rgba(232,121,249,0.2)); } 
+.thumb-img { background: linear-gradient(135deg, rgba(52,211,153,0.3), rgba(56,189,248,0.2)); } 
+.thumb-slide { background: linear-gradient(135deg, rgba(251,146,60,0.3), rgba(248,113,113,0.2)); } 
+.file-info { display: flex; align-items: center; gap: 12px; } 
+.file-name { font-size: 13px; color: rgba(255,255,255,0.85); font-weight: 500; } 
+.file-meta { font-size: 11px; color: var(--muted); margin-top: 2px; } 
+ 
+.badge-status { 
+  display: inline-flex; align-items: center; gap: 5px; 
+  font-size: 11.5px; font-weight: 500; 
+  padding: 4px 10px; 
+  border-radius: 100px; 
+} 
+.badge-status .dot { width: 6px; height: 6px; border-radius: 50%; } 
+.status-online { background: rgba(52,211,153,0.1); color: var(--green); border: 1px solid rgba(52,211,153,0.2); } 
+.status-online .dot { background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s infinite; } 
+.status-offline { background: rgba(248,113,113,0.1); color: var(--red); border: 1px solid rgba(248,113,113,0.2); } 
+.status-offline .dot { background: var(--red); } 
+.status-idle { background: rgba(251,146,60,0.1); color: var(--orange); border: 1px solid rgba(251,146,60,0.2); } 
+.status-idle .dot { background: var(--orange); } 
+@keyframes pulse { 
+  0%, 100% { opacity: 1; } 
+  50% { opacity: 0.4; } 
+} 
+ 
+.tag { 
+  display: inline-block; 
+  font-size: 11px; font-weight: 500; 
+  padding: 3px 9px; border-radius: 6px; 
+} 
+.tag-video { background: rgba(129,140,248,0.12); color: var(--indigo); } 
+.tag-img { background: rgba(52,211,153,0.1); color: var(--green); } 
+.tag-slide { background: rgba(251,146,60,0.1); color: var(--orange); } 
+ 
+.action-btns { display: flex; align-items: center; gap: 6px; } 
+.icon-btn { 
+  width: 30px; height: 30px; 
+  border-radius: 8px; 
+  border: 1px solid var(--border2); 
+  background: rgba(255,255,255,0.04); 
+  display: flex; align-items: center; justify-content: center; 
+  font-size: 13px; 
+  cursor: pointer; 
+  transition: all 0.18s; 
+  color: var(--muted); 
+} 
+.icon-btn:hover { background: rgba(255,255,255,0.08); color: var(--text); } 
+ 
+/* DEVICE CARDS */ 
+.devices-grid { 
+  display: grid; 
+  grid-template-columns: repeat(3, 1fr); 
+  gap: 14px; 
+  padding: 20px; 
+} 
+.device-card { 
+  background: rgba(255,255,255,0.03); 
+  border: 1px solid var(--border); 
+  border-radius: 14px; 
+  padding: 18px; 
+  transition: border-color 0.2s; 
+} 
+.device-card:hover { border-color: rgba(255,255,255,0.14); } 
+.device-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; } 
+.device-icon { font-size: 24px; } 
+.device-name { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.85); margin-bottom: 3px; } 
+.device-loc { font-size: 11.5px; color: var(--muted); } 
+.device-info { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); } 
+.info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; } 
+.info-key { font-size: 11px; color: var(--muted); } 
+.info-val { font-size: 11.5px; color: rgba(255,255,255,0.65); font-weight: 500; } 
+.progress-bar { 
+  width: 100%; height: 4px; 
+  background: rgba(255,255,255,0.08); 
+  border-radius: 2px; 
+  margin-top: 10px; 
+  overflow: hidden; 
+} 
+.progress-fill { 
+  height: 100%; 
+  border-radius: 2px; 
+  background: linear-gradient(90deg, var(--indigo), var(--pink)); 
+} 
+ 
+/* PREVIEW SCREEN */ 
+.preview-layout { 
+  flex: 1; 
+  display: grid; 
+  grid-template-columns: 1fr 340px; 
+  gap: 0; 
+  min-height: 100vh; 
+} 
+.preview-main { 
+  padding: 32px 32px 32px 36px; 
+  display: flex; 
+  flex-direction: column; 
+} 
+.tv-frame { 
+  background: #111; 
+  border-radius: 16px; 
+  border: 3px solid #2a2a3a; 
+  box-shadow: 0 0 0 6px #1a1a28, 0 30px 80px rgba(0,0,0,0.5); 
+  overflow: hidden; 
+  aspect-ratio: 16/9; 
+  width: 100%; 
+  position: relative; 
+} 
+.tv-screen { 
+  width: 100%; 
+  height: 100%; 
+  background: linear-gradient(135deg, #0a0a1a 0%, #12122a 50%, #0f0a1f 100%); 
+  position: relative; 
+  overflow: hidden; 
+  display: flex; 
+  flex-direction: column; 
+} 
+.tv-bg-glow { 
+  position: absolute; 
+  top: -60px; left: -60px; 
+  width: 300px; height: 300px; 
+  background: radial-gradient(circle, rgba(129,140,248,0.25) 0%, transparent 70%); 
+  pointer-events: none; 
+} 
+.tv-bg-glow2 { 
+  position: absolute; 
+  bottom: -40px; right: -40px; 
+  width: 250px; height: 250px; 
+  background: radial-gradient(circle, rgba(232,121,249,0.15) 0%, transparent 70%); 
+  pointer-events: none; 
+} 
+.tv-topbar { 
+  display: flex; align-items: center; justify-content: space-between; 
+  padding: 12px 18px; 
+  background: rgba(0,0,0,0.3); 
+  backdrop-filter: blur(10px); 
+  border-bottom: 1px solid rgba(255,255,255,0.06); 
+  position: relative; z-index: 2; 
+} 
+.tv-logo-small { 
+  font-family: 'Syne', sans-serif; 
+  font-size: 13px; 
+  font-weight: 800; 
+  background: linear-gradient(90deg, var(--indigo), var(--pink)); 
+  -webkit-background-clip: text; 
+  -webkit-text-fill-color: transparent; 
+  background-clip: text; 
+} 
+.tv-clock { 
+  font-family: 'Syne', sans-serif; 
+  font-size: 13px; 
+  font-weight: 700; 
+  color: rgba(255,255,255,0.8); 
+} 
+.tv-date { font-size: 11px; color: var(--muted); } 
+.tv-content { 
+  flex: 1; 
+  display: grid; 
+  grid-template-columns: 2fr 1fr; 
+  gap: 0; 
+  position: relative; z-index: 2; 
+} 
+.tv-hero { 
+  padding: 20px; 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: flex-end; 
+} 
+.tv-tag-small { 
+  display: inline-block; 
+  font-size: 9px; 
+  font-weight: 600; 
+  letter-spacing: 0.1em; 
+  text-transform: uppercase; 
+  background: rgba(129,140,248,0.2); 
+  color: var(--indigo); 
+  border-radius: 4px; 
+  padding: 3px 7px; 
+  margin-bottom: 8px; 
+} 
+.tv-headline { 
+  font-family: 'Syne', sans-serif; 
+  font-size: 18px; 
+  font-weight: 800; 
+  color: #fff; 
+  line-height: 1.2; 
+  letter-spacing: -0.02em; 
+  margin-bottom: 6px; 
+} 
+.tv-sub-text { 
+  font-size: 10px; 
+  color: rgba(255,255,255,0.45); 
+  font-weight: 300; 
+} 
+.tv-sidebar-panel { 
+  padding: 14px; 
+  border-left: 1px solid rgba(255,255,255,0.06); 
+  display: flex; 
+  flex-direction: column; 
+  gap: 8px; 
+  background: rgba(0,0,0,0.2); 
+} 
+.tv-mini-card { 
+  background: rgba(255,255,255,0.05); 
+  border-radius: 8px; 
+  padding: 10px; 
+  flex: 1; 
+} 
+.tv-mini-title { font-size: 9px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; } 
+.tv-mini-value { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: #fff; } 
+.tv-mini-sub { font-size: 9px; color: var(--muted); margin-top: 2px; } 
+.tv-ticker { 
+  background: rgba(0,0,0,0.4); 
+  border-top: 1px solid rgba(255,255,255,0.06); 
+  padding: 8px 18px; 
+  display: flex; align-items: center; gap: 10px; 
+  position: relative; z-index: 2; 
+  overflow: hidden; 
+} 
+.tv-ticker-label { 
+  font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; 
+  background: linear-gradient(90deg, var(--indigo), var(--pink)); 
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; 
+  white-space: nowrap; 
+} 
+.tv-ticker-text { 
+  font-size: 10px; color: rgba(255,255,255,0.55); font-weight: 300; 
+  animation: ticker 15s linear infinite; 
+  white-space: nowrap; 
+} 
+@keyframes ticker { 
+  from { transform: translateX(100%); } 
+  to { transform: translateX(-100%); } 
+} 
+.tv-stand { 
+  display: flex; justify-content: center; 
+  margin-top: 14px; 
+} 
+.tv-stand-neck { 
+  width: 60px; height: 18px; 
+  background: linear-gradient(180deg, #2a2a3a, #1a1a28); 
+  border-radius: 0 0 4px 4px; 
+} 
+.tv-stand-base { 
+  width: 120px; height: 10px; 
+  background: #1a1a28; 
+  border-radius: 0 0 6px 6px; 
+} 
+.tv-stand-wrap { display: flex; flex-direction: column; align-items: center; } 
+.preview-controls { 
+  display: flex; align-items: center; gap: 10px; 
+  margin-top: 22px; 
+} 
+.preview-panel { 
+  background: rgba(255,255,255,0.02); 
+  border-left: 1px solid var(--border); 
+  padding: 28px 22px; 
+  overflow-y: auto; 
+} 
+.preview-panel-title { 
+  font-family: 'Syne', sans-serif; 
+  font-size: 14px; 
+  font-weight: 700; 
+  color: rgba(255,255,255,0.8); 
+  margin-bottom: 18px; 
+} 
+.playlist-item { 
+  display: flex; align-items: center; gap: 10px; 
+  padding: 10px 12px; 
+  border-radius: 10px; 
+  margin-bottom: 6px; 
+  border: 1px solid transparent; 
+  cursor: pointer; 
+  transition: all 0.18s; 
+} 
+.playlist-item:hover { background: rgba(255,255,255,0.04); } 
+.playlist-item.playing { 
+  background: rgba(129,140,248,0.08); 
+  border-color: rgba(129,140,248,0.2); 
+} 
+.pl-num { 
+  width: 22px; height: 22px; 
+  border-radius: 6px; 
+  background: rgba(255,255,255,0.06); 
+  display: flex; align-items: center; justify-content: center; 
+  font-size: 10px; font-weight: 600; color: var(--muted); 
+  flex-shrink: 0; 
+} 
+.playlist-item.playing .pl-num { 
+  background: var(--indigo); 
+  color: #fff; 
+} 
+.pl-name { font-size: 12.5px; color: rgba(255,255,255,0.7); font-weight: 400; } 
+.pl-dur { font-size: 11px; color: var(--muted); margin-top: 1px; } 
+.pl-badge { margin-left: auto; } 
+ 
+.schedule-block { 
+  background: rgba(255,255,255,0.03); 
+  border: 1px solid var(--border); 
+  border-radius: 12px; 
+  padding: 14px; 
+  margin-bottom: 10px; 
+} 
+.schedule-time { 
+  font-family: 'Syne', sans-serif; 
+  font-size: 12px; font-weight: 700; 
+  color: var(--indigo); 
+  margin-bottom: 4px; 
+} 
+.schedule-name { font-size: 12.5px; color: rgba(255,255,255,0.7); font-weight: 500; } 
+.schedule-screens { font-size: 11px; color: var(--muted); margin-top: 2px; } 
+ 
+/* ANIMATIONS */ 
+.fade-in { animation: fadeIn 0.4s ease both; } 
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } 
+ 
+/* SCROLLBAR */ 
+::-webkit-scrollbar { width: 5px; } 
+::-webkit-scrollbar-track { background: transparent; } 
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; } 
+</style> 
+</head> 
+<body> 
+ 
+<!-- ==================== LOGIN ==================== --> 
+<div id="screen-login" class="screen active"> 
+  <div class="login-bg"></div> 
+  <div class="login-grid"></div> 
+  <div class="login-card"> 
+    <div class="logo"> 
+      <div class="logo-icon">📺</div> 
+      <span class="logo-text">Tv Arsal</span> 
+    </div> 
+    <h2 class="login-title">Bem-vindo de volta</h2> 
+    <p class="login-sub">Acesse o painel de gerenciamento de TV Corporativa</p> 
+    <div class="field"> 
+      <label>E-mail</label> 
+      <input type="email" placeholder="voce@empresa.com.br" value="admin@empresa.com.br"> 
+    </div> 
+    <div class="field"> 
+      <label>Senha</label> 
+      <input type="password" placeholder="••••••••" value="••••••••"> 
+    </div> 
+    <button class="btn-login" onclick="navigate('dashboard')">Entrar no Painel →</button> 
+    <p class="login-footer">Problemas de acesso? <a href="#">Falar com suporte</a></p> 
+  </div> 
+</div> 
+ 
+<!-- ==================== DASHBOARD ==================== --> 
+<div id="screen-dashboard" class="screen"> 
+  <aside class="sidebar"> 
+    <div class="sidebar-logo"> 
+      <div class="sidebar-logo-icon">📺</div> 
+      <span class="sidebar-logo-text">NexScreen</span> 
+    </div> 
+    <div class="nav-label">Principal</div> 
+    <div class="nav-item active" onclick="navigate('dashboard')"><span class="nav-icon">🏠</span> Dashboard</div> 
+    <div class="nav-item" onclick="navigate('videos')"><span class="nav-icon">🎬</span> Vídeos <span class="nav-badge">12</span></div> 
+    <div class="nav-item" onclick="navigate('devices')"><span class="nav-icon">📡</span> Dispositivos <span class="nav-badge">8</span></div> 
+    <div class="nav-item" onclick="navigate('preview')"><span class="nav-icon">👁️</span> Prévia TV</div> 
+    <div class="nav-label" style="margin-top:16px">Configurações</div> 
+    <div class="nav-item"><span class="nav-icon">📅</span> Agendamentos</div> 
+    <div class="nav-item"><span class="nav-icon">👥</span> Usuários</div> 
+    <div class="nav-item"><span class="nav-icon">⚙️</span> Configurações</div> 
+    <div class="sidebar-bottom"> 
+      <div class="user-chip"> 
+        <div class="avatar">A</div> 
+        <div class="user-info"> 
+          <div class="user-name">Admin</div> 
+          <div class="user-role">Administrador</div> 
+        </div> 
+        <button class="logout-btn" onclick="navigate('login')" title="Sair">⏏</button> 
+      </div> 
+    </div> 
+  </aside> 
+  <main class="main fade-in"> 
+    <div class="page-header"> 
+      <div> 
+        <div class="page-title">Dashboard</div> 
+        <div class="page-sub">Visão geral do sistema — Quarta, 15 de Abril de 2026</div> 
+      </div> 
+      <div style="display:flex;gap:10px"> 
+        <button class="btn btn-ghost">📥 Relatório</button> 
+        <button class="btn btn-primary" onclick="navigate('videos')">＋ Novo Conteúdo</button> 
+      </div> 
+    </div> 
+    <div class="stats-row"> 
+      <div class="stat-card s1"> 
+        <div class="stat-icon">🎬</div> 
+        <div class="stat-value">42</div> 
+        <div class="stat-label">Vídeos ativos</div> 
+        <div class="stat-change up">↑ +3 esta semana</div> 
+      </div> 
+      <div class="stat-card s2"> 
+        <div class="stat-icon">📡</div> 
+        <div class="stat-value">8</div> 
+        <div class="stat-label">TVs conectadas</div> 
+        <div class="stat-change up">↑ 7 online agora</div> 
+      </div> 
+      <div class="stat-card s3"> 
+        <div class="stat-icon">▶️</div> 
+        <div class="stat-value">98%</div> 
+        <div class="stat-label">Uptime mensal</div> 
+        <div class="stat-change up">↑ Ótimo</div> 
+      </div> 
+      <div class="stat-card s4"> 
+        <div class="stat-icon">📅</div> 
+        <div class="stat-value">5</div> 
+        <div class="stat-label">Agendamentos hoje</div> 
+        <div class="stat-change neutral">→ 2 em execução</div> 
+      </div> 
+    </div> 
+    <div class="section-card"> 
+      <div class="section-head"> 
+        <span class="section-title">📋 Conteúdo em exibição agora</span> 
+        <button class="btn btn-ghost" style="font-size:12px;padding:7px 13px" onclick="navigate('videos')">Ver todos</button> 
+      </div> 
+      <table> 
+        <thead> 
+          <tr><th>Conteúdo</th><th>Tipo</th><th>Exibindo em</th><th>Duração</th><th>Status</th></tr> 
+        </thead> 
+        <tbody> 
+          <tr> 
+            <td><div class="file-info"><div class="thumb thumb-video">🎬</div><div><div class="file-name">Institucional — Q1 2026</div><div class="file-meta">Atualizado há 2 dias</div></div></div></td> 
+            <td><span class="tag tag-video">Vídeo</span></td> 
+            <td>Recepção, Sala A</td> 
+            <td>3:24</td> 
+            <td><span class="badge-status status-online"><span class="dot"></span>Ao vivo</span></td> 
+          </tr> 
+          <tr> 
+            <td><div class="file-info"><div class="thumb thumb-img">🖼️</div><div><div class="file-name">Boas-vindas Novos Colaboradores</div><div class="file-meta">Atualizado há 5 dias</div></div></div></td> 
+            <td><span class="tag tag-img">Imagem</span></td> 
+            <td>RH, Corredor</td> 
+            <td>0:15</td> 
+            <td><span class="badge-status status-online"><span class="dot"></span>Ao vivo</span></td> 
+          </tr> 
+          <tr> 
+            <td><div class="file-info"><div class="thumb thumb-slide">📊</div><div><div class="file-name">Metas de Vendas — Abril</div><div class="file-meta">Atualizado hoje</div></div></div></td> 
+            <td><span class="tag tag-slide">Slides</span></td> 
+            <td>Comercial</td> 
+            <td>2:00</td> 
+            <td><span class="badge-status status-idle"><span class="dot"></span>Agendado</span></td> 
+          </tr> 
+        </tbody> 
+      </table> 
+    </div> 
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px"> 
+      <div class="section-card"> 
+        <div class="section-head"><span class="section-title">📡 Status dos Dispositivos</span><button class="btn btn-ghost" style="font-size:12px;padding:7px 13px" onclick="navigate('devices')">Ver todos</button></div> 
+        <table> 
+          <thead><tr><th>TV</th><th>Local</th><th>Status</th></tr></thead> 
+          <tbody> 
+            <tr><td><div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:500">TV-001</div></td><td style="color:var(--muted)">Recepção</td><td><span class="badge-status status-online"><span class="dot"></span>Online</span></td></tr> 
+            <tr><td><div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:500">TV-002</div></td><td style="color:var(--muted)">Sala de Reunião A</td><td><span class="badge-status status-online"><span class="dot"></span>Online</span></td></tr> 
+            <tr><td><div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:500">TV-003</div></td><td style="color:var(--muted)">Refeitório</td><td><span class="badge-status status-idle"><span class="dot"></span>Ocioso</span></td></tr> 
+            <tr><td><div style="font-size:13px;color:rgba(255,255,255,0.8);font-weight:500">TV-004</div></td><td style="color:var(--muted)">RH</td><td><span class="badge-status status-offline"><span class="dot"></span>Offline</span></td></tr> 
+          </tbody> 
+        </table> 
+      </div> 
+      <div class="section-card"> 
+        <div class="section-head"><span class="section-title">📅 Próximos Agendamentos</span></div> 
+        <div style="padding:14px"> 
+          <div class="schedule-block"> 
+            <div class="schedule-time">14:00 — 16:00</div> 
+            <div class="schedule-name">Comunicado Diretoria</div> 
+            <div class="schedule-screens">📺 Todas as telas</div> 
+          </div> 
+          <div class="schedule-block"> 
+            <div class="schedule-time">17:00 — 18:00</div> 
+            <div class="schedule-name">Encerramento do Expediente</div> 
+            <div class="schedule-screens">📺 Recepção, Corredor</div> 
+          </div> 
+          <div class="schedule-block"> 
+            <div class="schedule-time">08:00 — 09:00 (amanhã)</div> 
+            <div class="schedule-name">Abertura — Mensagem Motivacional</div> 
+            <div class="schedule-screens">📺 Todas as telas</div> 
+          </div> 
+        </div> 
+      </div> 
+    </div> 
+  </main> 
+</div> 
+ 
+<!-- ==================== VIDEOS ==================== --> 
+<div id="screen-videos" class="screen"> 
+  <aside class="sidebar"> 
+    <div class="sidebar-logo"><div class="sidebar-logo-icon">📺</div><span class="sidebar-logo-text">NexScreen</span></div> 
+    <div class="nav-label">Principal</div> 
+    <div class="nav-item" onclick="navigate('dashboard')"><span class="nav-icon">🏠</span> Dashboard</div> 
+    <div class="nav-item active" onclick="navigate('videos')"><span class="nav-icon">🎬</span> Vídeos <span class="nav-badge">12</span></div> 
+    <div class="nav-item" onclick="navigate('devices')"><span class="nav-icon">📡</span> Dispositivos <span class="nav-badge">8</span></div> 
+    <div class="nav-item" onclick="navigate('preview')"><span class="nav-icon">👁️</span> Prévia TV</div> 
+    <div class="nav-label" style="margin-top:16px">Configurações</div> 
+    <div class="nav-item"><span class="nav-icon">📅</span> Agendamentos</div> 
+    <div class="nav-item"><span class="nav-icon">👥</span> Usuários</div> 
+    <div class="nav-item"><span class="nav-icon">⚙️</span> Configurações</div> 
+    <div class="sidebar-bottom"><div class="user-chip"><div class="avatar">A</div><div class="user-info"><div class="user-name">Admin</div><div class="user-role">Administrador</div></div><button class="logout-btn" onclick="navigate('login')">⏏</button></div></div> 
+  </aside> 
+  <main class="main fade-in"> 
+    <div class="page-header"> 
+      <div> 
+        <div class="page-title">Gerenciar Vídeos</div> 
+        <div class="page-sub">42 arquivos de mídia · 12 ativos</div> 
+      </div> 
+      <div style="display:flex;gap:10px"> 
+        <button class="btn btn-ghost">🔽 Filtros</button> 
+        <button class="btn btn-primary">＋ Upload</button> 
+      </div> 
+    </div> 
+    <div class="section-card"> 
+      <div class="section-head"> 
+        <span class="section-title">📁 Biblioteca de Mídia</span> 
+        <div class="search-box"><span>🔍</span><input type="text" placeholder="Buscar arquivo..."></div> 
+      </div> 
+      <table> 
+        <thead><tr><th>Arquivo</th><th>Tipo</th><th>Duração</th><th>Tamanho</th><th>Última exibição</th><th>Status</th><th>Ações</th></tr></thead> 
+        <tbody> 
+          <tr> 
+            <td><div class="file-info"><div class="thumb thumb-video">🎬</div><div><div class="file-name">Institucional — Q1 2026</div><div class="file-meta">Adicionado em 13/04/2026</div></div></div></td> 
+            <td><span class="tag tag-video">MP4</span></td><td>3:24</td><td>142 MB</td><td>Hoje, 10:30</td> 
+            <td><span class="badge-status status-online"><span class="dot"></span>Ativo</span></td> 
+            <td><div class="action-btns"><div class="icon-btn" title="Editar">✏️</div><div class="icon-btn" title="Agendar">📅</div><div class="icon-btn" title="Prévia" onclick="navigate('preview')">👁️</div><div class="icon-btn" title="Excluir">🗑️</div></div></td> 
+          </tr> 
+          <tr> 
+            <td><div class="file-info"><div class="thumb thumb-img">🖼️</div><div><div class="file-name">Boas-vindas Novos Colaboradores</div><div class="file-meta">Adicionado em 10/04/2026</div></div></div></td> 
+            <td><span class="tag tag-img">PNG</span></td><td>0:15</td><td>4.2 MB</td><td>Hoje, 09:15</td> 
+            <td><span class="badge-status status-online"><span class="dot"></span>Ativo</span></td> 
+            <td><div class="action-btns"><div class="icon-btn">✏️</div><div class="icon-btn">📅</div><div class="icon-btn" onclick="navigate('preview')">👁️</div><div class="icon-btn">🗑️</div></div></td> 
+          </tr> 
+          <tr> 
+            <td><div class="file-info"><div class="thumb thumb-slide">📊</div><div><div class="file-name">Metas de Vendas — Abril</div><div class="file-meta">Adicionado em 15/04/2026</div></div></div></td> 
+            <td><span class="tag tag-slide">PPTX</span></td><td>2:00</td><td>8.7 MB</td><td>—</td> 
+            <td><span class="badge-status status-idle"><span class="dot"></span>Agendado</span></td> 
+            <td><div class="action-btns"><div class="icon-btn">✏️</div><div class="icon-btn">📅</div><div class="icon-btn" onclick="navigate('preview')">👁️</div><div class="icon-btn">🗑️</div></div></td> 
+          </tr> 
+          <tr> 
+            <td><div class="file-info"><div class="thumb thumb-video">🎬</div><div><div class="file-name">Tour Virtual — Escritório</div><div class="file-meta">Adicionado em 01/04/2026</div></div></div></td> 
+            <td><span class="tag tag-video">MP4</span></td><td>5:10</td><td>310 MB</td><td>12/04/2026</td> 
+            <td><span class="badge-status status-offline"><span class="dot"></span>Inativo</span></td> 
+            <td><div class="action-btns"><div class="icon-btn">✏️</div><div class="icon-btn">📅</div><div class="icon-btn" onclick="navigate('preview')">👁️</div><div class="icon-btn">🗑️</div></div></td> 
+          </tr> 
+          <tr> 
+            <td><div class="file-info"><div class="thumb thumb-img">🖼️</div><div><div class="file-name">Cardápio Refeitório — Semana 16</div><div class="file-meta">Adicionado em 14/04/2026</div></div></div></td> 
+            <td><span class="tag tag-img">JPG</span></td><td>0:30</td><td>2.1 MB</td><td>Hoje, 11:00</td> 
+            <td><span class="badge-status status-online"><span class="dot"></span>Ativo</span></td> 
+            <td><div class="action-btns"><div class="icon-btn">✏️</div><div class="icon-btn">📅</div><div class="icon-btn" onclick="navigate('preview')">👁️</div><div class="icon-btn">🗑️</div></div></td> 
+          </tr> 
+        </tbody> 
+      </table> 
+    </div> 
+  </main> 
+</div> 
+ 
+<!-- ==================== DEVICES ==================== --> 
+<div id="screen-devices" class="screen"> 
+  <aside class="sidebar"> 
+    <div class="sidebar-logo"><div class="sidebar-logo-icon">📺</div><span class="sidebar-logo-text">NexScreen</span></div> 
+    <div class="nav-label">Principal</div> 
+    <div class="nav-item" onclick="navigate('dashboard')"><span class="nav-icon">🏠</span> Dashboard</div> 
+    <div class="nav-item" onclick="navigate('videos')"><span class="nav-icon">🎬</span> Vídeos <span class="nav-badge">12</span></div> 
+    <div class="nav-item active" onclick="navigate('devices')"><span class="nav-icon">📡</span> Dispositivos <span class="nav-badge">8</span></div> 
+    <div class="nav-item" onclick="navigate('preview')"><span class="nav-icon">👁️</span> Prévia TV</div> 
+    <div class="nav-label" style="margin-top:16px">Configurações</div> 
+    <div class="nav-item"><span class="nav-icon">📅</span> Agendamentos</div> 
+    <div class="nav-item"><span class="nav-icon">👥</span> Usuários</div> 
+    <div class="nav-item"><span class="nav-icon">⚙️</span> Configurações</div> 
+    <div class="sidebar-bottom"><div class="user-chip"><div class="avatar">A</div><div class="user-info"><div class="user-name">Admin</div><div class="user-role">Administrador</div></div><button class="logout-btn" onclick="navigate('login')">⏏</button></div></div> 
+  </aside> 
+  <main class="main fade-in"> 
+    <div class="page-header"> 
+      <div> 
+        <div class="page-title">Gerenciar Dispositivos</div> 
+        <div class="page-sub">8 TVs cadastradas · 7 online agora</div> 
+      </div> 
+      <div style="display:flex;gap:10px"> 
+        <button class="btn btn-ghost">🔄 Atualizar</button> 
+        <button class="btn btn-primary">＋ Adicionar TV</button> 
+      </div> 
+    </div> 
+    <div class="section-card"> 
+      <div class="section-head"> 
+        <span class="section-title">📡 Todos os Dispositivos</span> 
+        <div style="display:flex;gap:8px"> 
+          <span class="badge-status status-online" style="font-size:11px"><span class="dot"></span>7 Online</span> 
+          <span class="badge-status status-offline" style="font-size:11px"><span class="dot"></span>1 Offline</span> 
+        </div> 
+      </div> 
+      <div class="devices-grid"> 
+        <div class="device-card"> 
+          <div class="device-top"><span class="device-icon">📺</span><span class="badge-status status-online"><span class="dot"></span>Online</span></div> 
+          <div class="device-name">TV-001 — Recepção</div> 
+          <div class="device-loc">📍 Térreo · Entrada Principal</div> 
+          <div class="device-info"> 
+            <div class="info-row"><span class="info-key">Resolução</span><span class="info-val">1920×1080</span></div> 
+            <div class="info-row"><span class="info-key">Reproduzindo</span><span class="info-val">Institucional Q1</span></div> 
+            <div class="info-row"><span class="info-key">Uptime</span><span class="info-val">99.8%</span></div> 
+            <div class="progress-bar"><div class="progress-fill" style="width:99%"></div></div> 
+          </div> 
+        </div> 
+        <div class="device-card"> 
+          <div class="device-top"><span class="device-icon">📺</span><span class="badge-status status-online"><span class="dot"></span>Online</span></div> 
+          <div class="device-name">TV-002 — Sala de Reunião A</div> 
+          <div class="device-loc">📍 2º Andar · Ala Leste</div> 
+          <div class="device-info"> 
+            <div class="info-row"><span class="info-key">Resolução</span><span class="info-val">3840×2160</span></div> 
+            <div class="info-row"><span class="info-key">Reproduzindo</span><span class="info-val">Metas Abril</span></div> 
+            <div class="info-row"><span class="info-key">Uptime</span><span class="info-val">97.2%</span></div> 
+            <div class="progress-bar"><div class="progress-fill" style="width:97%"></div></div> 
+          </div> 
+        </div> 
+        <div class="device-card"> 
+          <div class="device-top"><span class="device-icon">📺</span><span class="badge-status status-idle"><span class="dot"></span>Ocioso</span></div> 
+          <div class="device-name">TV-003 — Refeitório</div> 
+          <div class="device-loc">📍 Térreo · Ala Central</div> 
+          <div class="device-info"> 
+            <div class="info-row"><span class="info-key">Resolução</span><span class="info-val">1920×1080</span></div> 
+            <div class="info-row"><span class="info-key">Reproduzindo</span><span class="info-val">Cardápio Semana 16</span></div> 
+            <div class="info-row"><span class="info-key">Uptime</span><span class="info-val">94.1%</span></div> 
+            <div class="progress-bar"><div class="progress-fill" style="width:94%"></div></div> 
+          </div> 
+        </div> 
+        <div class="device-card"> 
+          <div class="device-top"><span class="device-icon">📺</span><span class="badge-status status-offline"><span class="dot"></span>Offline</span></div> 
+          <div class="device-name">TV-004 — RH</div> 
+          <div class="device-loc">📍 1º Andar · Departamento RH</div> 
+          <div class="device-info"> 
+            <div class="info-row"><span class="info-key">Resolução</span><span class="info-val">1920×1080</span></div> 
+            <div class="info-row"><span class="info-key">Último acesso</span><span class="info-val">Ontem 18:32</span></div> 
+            <div class="info-row"><span class="info-key">Uptime</span><span class="info-val">81.0%</span></div> 
+            <div class="progress-bar"><div class="progress-fill" style="width:81%;background:linear-gradient(90deg,var(--red),var(--orange))"></div></div> 
+          </div> 
+        </div> 
+        <div class="device-card"> 
+          <div class="device-top"><span class="device-icon">📺</span><span class="badge-status status-online"><span class="dot"></span>Online</span></div> 
+          <div class="device-name">TV-005 — Corredor Principal</div> 
+          <div class="device-loc">📍 1º Andar · Corredor A</div> 
+          <div class="device-info"> 
+            <div class="info-row"><span class="info-key">Resolução</span><span class="info-val">1920×1080</span></div> 
+            <div class="info-row"><span class="info-key">Reproduzindo</span><span class="info-val">Boas-vindas</span></div> 
+            <div class="info-row"><span class="info-key">Uptime</span><span class="info-val">98.5%</span></div> 
+            <div class="progress-bar"><div class="progress-fill" style="width:98%"></div></div> 
+          </div> 
+        </div> 
+        <div class="device-card"> 
+          <div class="device-top"><span class="device-icon">📺</span><span class="badge-status status-online"><span class="dot"></span>Online</span></div> 
+          <div class="device-name">TV-006 — Diretoria</div> 
+          <div class="device-loc">📍 3º Andar · Sala Diretoria</div> 
+          <div class="device-info"> 
+            <div class="info-row"><span class="info-key">Resolução</span><span class="info-val">3840×2160</span></div> 
+            <div class="info-row"><span class="info-key">Reproduzindo</span><span class="info-val">Institucional Q1</span></div> 
+            <div class="info-row"><span class="info-key">Uptime</span><span class="info-val">100%</span></div> 
+            <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div> 
+          </div> 
+        </div> 
+      </div> 
+    </div> 
+  </main> 
+</div> 
+ 
+<!-- ==================== PREVIEW ==================== --> 
+<div id="screen-preview" class="screen"> 
+  <aside class="sidebar"> 
+    <div class="sidebar-logo"><div class="sidebar-logo-icon">📺</div><span class="sidebar-logo-text">NexScreen</span></div> 
+    <div class="nav-label">Principal</div> 
+    <div class="nav-item" onclick="navigate('dashboard')"><span class="nav-icon">🏠</span> Dashboard</div> 
+    <div class="nav-item" onclick="navigate('videos')"><span class="nav-icon">🎬</span> Vídeos <span class="nav-badge">12</span></div> 
+    <div class="nav-item" onclick="navigate('devices')"><span class="nav-icon">📡</span> Dispositivos <span class="nav-badge">8</span></div> 
+    <div class="nav-item active" onclick="navigate('preview')"><span class="nav-icon">👁️</span> Prévia TV</div> 
+    <div class="nav-label" style="margin-top:16px">Configurações</div> 
+    <div class="nav-item"><span class="nav-icon">📅</span> Agendamentos</div> 
+    <div class="nav-item"><span class="nav-icon">👥</span> Usuários</div> 
+    <div class="nav-item"><span class="nav-icon">⚙️</span> Configurações</div> 
+    <div class="sidebar-bottom"><div class="user-chip"><div class="avatar">A</div><div class="user-info"><div class="user-name">Admin</div><div class="user-role">Administrador</div></div><button class="logout-btn" onclick="navigate('login')">⏏</button></div></div> 
+  </aside> 
+  <div class="preview-layout fade-in"> 
+    <div class="preview-main"> 
+      <div class="page-header" style="margin-bottom:18px"> 
+        <div> 
+          <div class="page-title">Prévia da TV</div> 
+          <div class="page-sub">Simulação em tempo real — TV-001 Recepção</div> 
+        </div> 
+        <div style="display:flex;gap:10px"> 
+          <button class="btn btn-ghost">📺 Trocar TV</button> 
+          <button class="btn btn-primary">▶ Publicar</button> 
+        </div> 
+      </div> 
+ 
+      <!-- TV FRAME --> 
+      <div class="tv-stand-wrap" style="margin-bottom:0"> 
+        <div class="tv-frame"> 
+          <div class="tv-screen"> 
+            <div class="tv-bg-glow"></div> 
+            <div class="tv-bg-glow2"></div> 
+            <div class="tv-topbar"> 
+              <span class="tv-logo-small">NexScreen</span> 
+              <div style="text-align:center"> 
+                <div class="tv-clock" id="tv-clock">22:31</div> 
+                <div class="tv-date">Quarta, 15 de Abril de 2026</div> 
+              </div> 
+              <div style="display:flex;align-items:center;gap:8px"> 
+                <span class="badge-status status-online" style="font-size:9px;padding:3px 8px"><span class="dot"></span>Ao Vivo</span> 
+              </div> 
+            </div> 
+            <div class="tv-content"> 
+              <div class="tv-hero"> 
+                <div class="tv-tag-small">📢 Comunicado Corporativo</div> 
+                <div class="tv-headline">Bem-vindo à<br>Empresa XYZ</div> 
+                <div class="tv-sub-text">Conectando pessoas, criando resultados extraordinários.</div> 
+              </div> 
+              <div class="tv-sidebar-panel"> 
+                <div class="tv-mini-card"> 
+                  <div class="tv-mini-title">⏰ Próximo evento</div> 
+                  <div class="tv-mini-value" style="font-size:16px">14:00</div> 
+                  <div class="tv-mini-sub">Reunião Diretoria</div> 
+                </div> 
+                <div class="tv-mini-card"> 
+                  <div class="tv-mini-title">🌡 Temperatura</div> 
+                  <div class="tv-mini-value">24°C</div> 
+                  <div class="tv-mini-sub">São Paulo, SP</div> 
+                </div> 
+                <div class="tv-mini-card"> 
+                  <div class="tv-mini-title">📊 Meta Mensal</div> 
+                  <div class="tv-mini-value">78%</div> 
+                  <div class="tv-mini-sub">↑ +12% vs mês ant.</div> 
+                </div> 
+              </div> 
+            </div> 
+            <div class="tv-ticker"> 
+              <span class="tv-ticker-label">NexScreen</span> 
+              <span class="tv-ticker-text">🔔 Reunião de alinhamento às 14h na Sala A &nbsp;&nbsp;·&nbsp;&nbsp; 🎉 Bem-vindos aos novos colaboradores desta semana! &nbsp;&nbsp;·&nbsp;&nbsp; 📊 Meta de Abril em 78% — vamos juntos! &nbsp;&nbsp;·&nbsp;&nbsp; ☕ Refeitório aberto das 12h às 14h &nbsp;&nbsp;·&nbsp;&nbsp;</span> 
+            </div> 
+          </div> 
+        </div> 
+        <div class="tv-stand-wrap"> 
+          <div class="tv-stand-neck"></div> 
+          <div class="tv-stand-base"></div> 
+        </div> 
+      </div> 
+ 
+      <div class="preview-controls"> 
+        <button class="btn btn-ghost">⏮ Anterior</button> 
+        <button class="btn btn-primary" style="flex:1;justify-content:center">⏸ Pausar Prévia</button> 
+        <button class="btn btn-ghost">Próximo ⏭</button> 
+      </div> 
+    </div> 
+ 
+    <!-- PLAYLIST PANEL --> 
+    <div class="preview-panel"> 
+      <div class="preview-panel-title">📋 Playlist Ativa</div> 
+      <div class="playlist-item playing"> 
+        <div class="pl-num">▶</div> 
+        <div><div class="pl-name">Institucional Q1 2026</div><div class="pl-dur">3:24 · MP4</div></div> 
+        <span class="tag tag-video pl-badge">Ao vivo</span> 
+      </div> 
+      <div class="playlist-item"> 
+        <div class="pl-num">2</div> 
+        <div><div class="pl-name">Boas-vindas Colaboradores</div><div class="pl-dur">0:15 · PNG</div></div> 
+      </div> 
+      <div class="playlist-item"> 
+        <div class="pl-num">3</div> 
+        <div><div class="pl-name">Metas de Vendas — Abril</div><div class="pl-dur">2:00 · PPTX</div></div> 
+      </div> 
+      <div class="playlist-item"> 
+        <div class="pl-num">4</div> 
+        <div><div class="pl-name">Cardápio Semana 16</div><div class="pl-dur">0:30 · JPG</div></div> 
+      </div> 
+      <div class="playlist-item"> 
+        <div class="pl-num">5</div> 
+        <div><div class="pl-name">Tour Virtual Escritório</div><div class="pl-dur">5:10 · MP4</div></div> 
+      </div> 
+ 
+      <div style="margin-top:22px"> 
+        <div class="preview-panel-title">📅 Agendamentos Hoje</div> 
+        <div class="schedule-block"> 
+          <div class="schedule-time">14:00 — 16:00</div> 
+          <div class="schedule-name">Comunicado Diretoria</div> 
+          <div class="schedule-screens">📺 Todas as telas</div> 
+        </div> 
+        <div class="schedule-block"> 
+          <div class="schedule-time">17:00 — 18:00</div> 
+          <div class="schedule-name">Encerramento Expediente</div> 
+          <div class="schedule-screens">📺 Recepção, Corredor</div> 
+        </div> 
+      </div> 
+ 
+      <div style="margin-top:22px"> 
+        <div class="preview-panel-title">⚙️ Configuração da Tela</div> 
+        <div class="schedule-block"> 
+          <div class="info-row"><span class="info-key" style="font-size:12px">Dispositivo</span><span class="info-val" style="font-size:12px">TV-001</span></div> 
+          <div class="info-row" style="margin-top:5px"><span class="info-key" style="font-size:12px">Local</span><span class="info-val" style="font-size:12px">Recepção</span></div> 
+          <div class="info-row" style="margin-top:5px"><span class="info-key" style="font-size:12px">Resolução</span><span class="info-val" style="font-size:12px">1920×1080</span></div> 
+          <div class="info-row" style="margin-top:5px"><span class="info-key" style="font-size:12px">Orientação</span><span class="info-val" style="font-size:12px">Paisagem</span></div> 
+        </div> 
+      </div> 
+    </div> 
+  </div> 
+</div> 
+ 
+<script> 
+function navigate(page) { 
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
+  document.getElementById('screen-' + page).classList.add('active'); 
+  window.scrollTo(0, 0); 
+} 
+ 
+// Live clock on TV preview 
+function updateClock() { 
+  const el = document.getElementById('tv-clock'); 
+  if (el) { 
+    const now = new Date(); 
+    const h = String(now.getHours()).padStart(2,'0'); 
+    const m = String(now.getMinutes()).padStart(2,'0'); 
+    el.textContent = h + ':' + m; 
+  } 
+} 
+updateClock(); 
+setInterval(updateClock, 30000); 
+</script> 
+</body> 
+</html> 
+
