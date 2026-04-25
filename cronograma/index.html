@@ -1,0 +1,1811 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyFlow — Seu Concurso, Organizado</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root {
+  /* Science of Color: warm amber/gold = motivation, energy, optimism */
+  /* Deep teal = focus, calm, trust */
+  /* Coral = urgency without stress */
+  --bg:         #0d0f14;
+  --surface:    #13161e;
+  --surface2:   #1a1e2a;
+  --surface3:   rgba(255,255,255,0.04);
+  --border:     rgba(255,255,255,0.08);
+  --border2:    rgba(255,255,255,0.14);
+  --text:       #eef0f6;
+  --muted:      rgba(255,255,255,0.35);
+  --muted2:     rgba(255,255,255,0.55);
+
+  --gold:       #f5c542;   /* motivation, achievement */
+  --gold-dim:   rgba(245,197,66,0.12);
+  --teal:       #2dd4bf;   /* focus, calm */
+  --teal-dim:   rgba(45,212,191,0.1);
+  --coral:      #ff6b6b;   /* urgency, errors */
+  --coral-dim:  rgba(255,107,107,0.1);
+  --violet:     #a78bfa;   /* creativity, memory */
+  --violet-dim: rgba(167,139,250,0.1);
+  --green:      #4ade80;   /* success, correct */
+  --green-dim:  rgba(74,222,128,0.1);
+  --orange:     #fb923c;   /* energy */
+
+  --radius:     14px;
+  --radius-sm:  9px;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── UTILS ── */
+.hidden { display: none !important; }
+.fade { animation: fadeIn .35s ease both; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+@keyframes slideIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+@keyframes pop { 0%{transform:scale(.9);opacity:0} 70%{transform:scale(1.04)} 100%{transform:scale(1);opacity:1} }
+@keyframes glow { 0%,100%{box-shadow:0 0 20px rgba(245,197,66,.2)} 50%{box-shadow:0 0 40px rgba(245,197,66,.4)} }
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+
+/* ── SCREENS ── */
+.screen { display:none; min-height:100vh; }
+.screen.active { display:flex; }
+
+/* ══════════════════════════════════════════
+   LOGIN
+══════════════════════════════════════════ */
+#s-login {
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+  background: radial-gradient(ellipse 800px 600px at 30% 60%, rgba(245,197,66,.07) 0%, transparent 60%),
+              radial-gradient(ellipse 600px 500px at 80% 20%, rgba(45,212,191,.06) 0%, transparent 60%),
+              var(--bg);
+}
+.login-noise {
+  position:absolute;inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;
+}
+.login-grid {
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);
+  background-size:48px 48px;
+  mask-image:radial-gradient(ellipse 70% 70% at 50% 50%,black 40%,transparent 100%);
+  pointer-events:none;
+}
+.login-card {
+  position:relative;
+  width:440px;
+  background:rgba(19,22,30,.95);
+  border:1px solid var(--border2);
+  border-radius:24px;
+  padding:48px 44px;
+  backdrop-filter:blur(24px);
+  box-shadow:0 40px 100px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04);
+  animation:pop .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+.brand {
+  display:flex;align-items:center;gap:11px;
+  margin-bottom:36px;
+}
+.brand-icon {
+  width:42px;height:42px;
+  background:linear-gradient(135deg,var(--gold),var(--orange));
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+  box-shadow:0 8px 24px rgba(245,197,66,.3);
+  animation:glow 3s ease-in-out infinite;
+}
+.brand-name {
+  font-family:'Syne',sans-serif;
+  font-size:26px;font-weight:800;
+  background:linear-gradient(90deg,var(--gold),var(--teal));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.login-title { font-family:'Syne',sans-serif;font-size:28px;font-weight:700;color:#fff;margin-bottom:6px; }
+.login-sub { font-size:13px;color:var(--muted);font-weight:300;margin-bottom:32px; }
+
+.field { margin-bottom:18px; }
+.field label { display:block;font-size:11px;font-weight:600;color:rgba(255,255,255,.45);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px; }
+.field input {
+  width:100%;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border2);
+  border-radius:11px;
+  padding:13px 16px;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:14px;color:var(--text);
+  outline:none;
+  transition:border-color .2s,box-shadow .2s,background .2s;
+}
+.field input:focus {
+  border-color:var(--gold);
+  background:rgba(245,197,66,.04);
+  box-shadow:0 0 0 3px rgba(245,197,66,.12);
+}
+.field input::placeholder { color:rgba(255,255,255,.18); }
+
+.btn-cta {
+  width:100%;margin-top:4px;
+  padding:15px;
+  background:linear-gradient(135deg,var(--gold),var(--orange));
+  border:none;border-radius:12px;
+  font-family:'Syne',sans-serif;font-size:15px;font-weight:700;
+  color:#0d0f14;cursor:pointer;letter-spacing:.03em;
+  transition:opacity .2s,transform .15s;
+  box-shadow:0 8px 32px rgba(245,197,66,.35);
+}
+.btn-cta:hover{opacity:.92;transform:translateY(-1px)}
+.btn-cta:active{transform:translateY(0)}
+.login-switch { margin-top:18px;text-align:center;font-size:13px;color:var(--muted); }
+.login-switch a { color:var(--teal);text-decoration:none;font-weight:500; }
+.login-switch a:hover { text-decoration:underline; }
+.login-error { 
+  background:var(--coral-dim);border:1px solid rgba(255,107,107,.25);
+  color:var(--coral);font-size:12.5px;border-radius:9px;padding:10px 14px;
+  margin-bottom:16px;display:none;
+}
+
+/* ══════════════════════════════════════════
+   APP LAYOUT
+══════════════════════════════════════════ */
+#s-app { flex-direction:row; }
+
+.sidebar {
+  width:240px;min-height:100vh;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  padding:24px 14px;
+  display:flex;flex-direction:column;
+  position:sticky;top:0;height:100vh;
+  flex-shrink:0;
+}
+.sb-brand {
+  display:flex;align-items:center;gap:9px;
+  padding:0 8px;margin-bottom:28px;
+}
+.sb-brand-icon {
+  width:34px;height:34px;
+  background:linear-gradient(135deg,var(--gold),var(--orange));
+  border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;
+  box-shadow:0 4px 16px rgba(245,197,66,.25);
+}
+.sb-brand-name {
+  font-family:'Syne',sans-serif;font-size:18px;font-weight:800;
+  background:linear-gradient(90deg,var(--gold),var(--teal));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+.nav-section { font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:0 10px;margin:16px 0 6px; }
+.nav-item {
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:10px;
+  font-size:13.5px;font-weight:400;
+  color:rgba(255,255,255,.45);cursor:pointer;
+  transition:all .18s;margin-bottom:2px;
+  border:1px solid transparent;
+  user-select:none;
+  position:relative;
+}
+.nav-item:hover { background:rgba(255,255,255,.04);color:rgba(255,255,255,.75); }
+.nav-item.active {
+  background:linear-gradient(135deg,rgba(245,197,66,.12),rgba(251,146,60,.08));
+  color:var(--gold);
+  border-color:rgba(245,197,66,.2);
+  font-weight:500;
+}
+.nav-icon { font-size:16px;width:20px;text-align:center; }
+.nav-badge {
+  margin-left:auto;background:rgba(245,197,66,.2);color:var(--gold);
+  font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;
+}
+.nav-alert { 
+  margin-left:auto;background:var(--coral-dim);color:var(--coral);
+  font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;
+  animation:pulse 2s infinite;
+}
+
+.sidebar-bottom { margin-top:auto;border-top:1px solid var(--border);padding-top:14px; }
+.user-chip {
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:10px;cursor:pointer;
+  transition:background .18s;
+}
+.user-chip:hover { background:rgba(255,255,255,.04); }
+.avatar {
+  width:34px;height:34px;border-radius:50%;
+  background:linear-gradient(135deg,var(--teal),var(--violet));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;
+}
+.user-info .u-name { font-size:13px;font-weight:600;color:rgba(255,255,255,.8); }
+.user-info .u-role { font-size:11px;color:var(--muted); }
+.logout-btn { margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;transition:color .2s; }
+.logout-btn:hover { color:var(--coral); }
+
+/* MAIN */
+.main { flex:1;min-height:100vh;overflow-y:auto; }
+.page { display:none;padding:32px 36px;animation:fadeIn .3s ease both; }
+.page.active { display:block; }
+
+.page-hd {
+  display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:28px;
+}
+.page-title { font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:#fff;letter-spacing:-.02em; }
+.page-sub { font-size:13px;color:var(--muted);margin-top:3px;font-weight:300; }
+
+/* BUTTONS */
+.btn {
+  display:inline-flex;align-items:center;gap:7px;
+  padding:10px 18px;border-radius:10px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;font-weight:500;
+  cursor:pointer;border:none;transition:all .18s;
+  white-space:nowrap;
+}
+.btn-primary { background:linear-gradient(135deg,var(--gold),var(--orange));color:#0d0f14;font-weight:700;box-shadow:0 4px 20px rgba(245,197,66,.25); }
+.btn-primary:hover { opacity:.9;transform:translateY(-1px); }
+.btn-teal { background:linear-gradient(135deg,var(--teal),#0d9488);color:#0d0f14;font-weight:700;box-shadow:0 4px 20px rgba(45,212,191,.2); }
+.btn-teal:hover { opacity:.9;transform:translateY(-1px); }
+.btn-ghost { background:rgba(255,255,255,.05);border:1px solid var(--border2);color:rgba(255,255,255,.6); }
+.btn-ghost:hover { background:rgba(255,255,255,.09);color:var(--text); }
+.btn-danger { background:var(--coral-dim);border:1px solid rgba(255,107,107,.25);color:var(--coral); }
+.btn-danger:hover { background:rgba(255,107,107,.2); }
+.btn-sm { padding:7px 13px;font-size:12px;border-radius:8px; }
+.btn-xs { padding:5px 10px;font-size:11px;border-radius:7px; }
+
+/* CARDS */
+.card {
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:18px;
+  overflow:hidden;
+}
+.card-head {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 22px 16px;
+  border-bottom:1px solid var(--border);
+}
+.card-title { font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:rgba(255,255,255,.8); }
+
+/* STAT CARDS */
+.stats-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px; }
+.stat-c {
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:20px;
+  position:relative;overflow:hidden;
+  transition:border-color .2s,transform .2s;
+}
+.stat-c:hover { border-color:var(--border2);transform:translateY(-2px); }
+.stat-c::before {
+  content:'';position:absolute;top:-40px;right:-20px;
+  width:100px;height:100px;border-radius:50%;opacity:.08;
+}
+.sc-gold::before { background:var(--gold); }
+.sc-teal::before { background:var(--teal); }
+.sc-coral::before { background:var(--coral); }
+.sc-violet::before { background:var(--violet); }
+.stat-icon { font-size:22px;margin-bottom:10px; }
+.stat-val { font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#fff;line-height:1; }
+.stat-lbl { font-size:12px;color:var(--muted);margin-top:4px;font-weight:300; }
+.stat-sub { font-size:11px;margin-top:7px;font-weight:500;display:flex;align-items:center;gap:4px; }
+.sub-up { color:var(--green); } .sub-warn { color:var(--gold); } .sub-alert { color:var(--coral); }
+
+/* PROGRESS BAR */
+.progress { height:6px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden;margin-top:8px; }
+.progress-fill { height:100%;border-radius:3px;transition:width .6s cubic-bezier(.34,1.56,.64,1); }
+.pf-gold { background:linear-gradient(90deg,var(--gold),var(--orange)); }
+.pf-teal { background:linear-gradient(90deg,var(--teal),#0d9488); }
+.pf-coral { background:linear-gradient(90deg,var(--coral),#ff8e53); }
+.pf-violet { background:linear-gradient(90deg,var(--violet),#818cf8); }
+.pf-green { background:linear-gradient(90deg,var(--green),var(--teal)); }
+
+/* BADGE / TAG */
+.badge {
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11.5px;font-weight:500;padding:4px 10px;border-radius:100px;
+}
+.b-gold { background:var(--gold-dim);color:var(--gold);border:1px solid rgba(245,197,66,.2); }
+.b-teal { background:var(--teal-dim);color:var(--teal);border:1px solid rgba(45,212,191,.2); }
+.b-coral { background:var(--coral-dim);color:var(--coral);border:1px solid rgba(255,107,107,.2); }
+.b-green { background:var(--green-dim);color:var(--green);border:1px solid rgba(74,222,128,.2); }
+.b-violet { background:var(--violet-dim);color:var(--violet);border:1px solid rgba(167,139,250,.2); }
+.b-muted { background:rgba(255,255,255,.05);color:var(--muted2);border:1px solid var(--border); }
+.dot { width:6px;height:6px;border-radius:50%;background:currentColor; }
+.dot-pulse { animation:pulse 2s infinite; }
+
+/* TABLE */
+table { width:100%;border-collapse:collapse; }
+th { padding:10px 18px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;border-bottom:1px solid var(--border); }
+td { padding:13px 18px;font-size:13px;color:rgba(255,255,255,.7);border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle; }
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:rgba(255,255,255,.02); }
+
+/* FORM ELEMENTS */
+.form-group { margin-bottom:16px; }
+.form-label { display:block;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:8px; }
+.form-input, .form-select, .form-textarea {
+  width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border2);
+  border-radius:10px;padding:12px 14px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:13.5px;color:var(--text);
+  outline:none;transition:border-color .2s,box-shadow .2s;
+}
+.form-input:focus,.form-select:focus,.form-textarea:focus {
+  border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,197,66,.1);
+}
+.form-input::placeholder,.form-textarea::placeholder { color:rgba(255,255,255,.18); }
+.form-select option { background:var(--surface2); }
+.form-textarea { resize:vertical;min-height:80px; }
+
+/* MODAL */
+.modal-overlay {
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;
+  z-index:1000;padding:20px;
+}
+.modal-overlay.open { display:flex; }
+.modal {
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:22px;padding:32px;
+  width:100%;max-width:520px;
+  animation:pop .3s cubic-bezier(.34,1.56,.64,1) both;
+  max-height:90vh;overflow-y:auto;
+}
+.modal-title { font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;margin-bottom:6px; }
+.modal-sub { font-size:13px;color:var(--muted);margin-bottom:24px; }
+.modal-actions { display:flex;gap:10px;justify-content:flex-end;margin-top:24px; }
+
+/* ── TOAST ── */
+.toast-container { position:fixed;bottom:24px;right:24px;z-index:2000;display:flex;flex-direction:column;gap:10px; }
+.toast {
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:12px;padding:14px 18px;
+  display:flex;align-items:center;gap:12px;
+  font-size:13.5px;font-weight:500;color:var(--text);
+  box-shadow:0 10px 40px rgba(0,0,0,.4);
+  animation:slideIn .3s ease both;
+  min-width:260px;
+}
+.toast.success { border-color:rgba(74,222,128,.3); }
+.toast.error   { border-color:rgba(255,107,107,.3); }
+.toast.info    { border-color:rgba(45,212,191,.3); }
+
+/* ══════════════════════════════════════════
+   DASHBOARD PAGE
+══════════════════════════════════════════ */
+.exam-countdown {
+  background:linear-gradient(135deg,rgba(245,197,66,.08),rgba(251,146,60,.05));
+  border:1px solid rgba(245,197,66,.2);
+  border-radius:18px;padding:24px 28px;margin-bottom:24px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.countdown-left .ec-label { font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:8px; }
+.countdown-left .ec-name { font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#fff; }
+.countdown-left .ec-date { font-size:13px;color:var(--muted);margin-top:4px; }
+.countdown-right { text-align:right; }
+.countdown-right .days-num { font-family:'Syne',sans-serif;font-size:52px;font-weight:800;line-height:1;background:linear-gradient(135deg,var(--gold),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+.countdown-right .days-lbl { font-size:12px;color:var(--muted);font-weight:300; }
+
+.today-card {
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:18px;padding:22px;margin-bottom:24px;
+}
+.today-title { font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#fff;margin-bottom:16px;display:flex;align-items:center;gap:8px; }
+.today-subjects { display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px; }
+.today-sub-card {
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:12px;padding:14px;cursor:pointer;
+  transition:all .2s;
+}
+.today-sub-card:hover { border-color:var(--gold);background:var(--gold-dim); }
+.tsub-name { font-size:13.5px;font-weight:600;color:rgba(255,255,255,.85);margin-bottom:6px; }
+.tsub-topics { font-size:11.5px;color:var(--muted);margin-bottom:10px; }
+.tsub-status { display:flex;align-items:center;justify-content:space-between; }
+
+.revision-list { display:flex;flex-direction:column;gap:8px; }
+.revision-item {
+  display:flex;align-items:center;gap:12px;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:10px;padding:12px 16px;
+  cursor:pointer;transition:all .18s;
+}
+.revision-item:hover { border-color:var(--teal);background:var(--teal-dim); }
+.rev-icon { font-size:20px;flex-shrink:0; }
+.rev-name { font-size:13px;font-weight:500;color:rgba(255,255,255,.8); }
+.rev-meta { font-size:11px;color:var(--muted); }
+.rev-when { margin-left:auto;font-size:11px;font-weight:600;color:var(--teal);white-space:nowrap; }
+.rev-when.urgent { color:var(--coral);animation:pulse 2s infinite; }
+
+/* ══════════════════════════════════════════
+   SUBJECTS PAGE
+══════════════════════════════════════════ */
+.subjects-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px; }
+.subject-card {
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:18px;padding:20px;
+  transition:all .2s;cursor:pointer;
+  position:relative;overflow:hidden;
+}
+.subject-card::before {
+  content:'';position:absolute;top:-30px;right:-20px;
+  width:100px;height:100px;border-radius:50%;opacity:.06;
+}
+.subject-card:hover { transform:translateY(-3px);border-color:var(--border2); }
+.sub-color-bar { position:absolute;top:0;left:0;right:0;height:3px; }
+.sub-header { display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px; }
+.sub-name { font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#fff; }
+.sub-count { font-size:12px;color:var(--muted);margin-top:3px; }
+.sub-actions { display:flex;gap:6px; }
+.icon-btn {
+  width:30px;height:30px;border-radius:8px;
+  border:1px solid var(--border2);background:rgba(255,255,255,.04);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;cursor:pointer;transition:all .18s;color:var(--muted);
+}
+.icon-btn:hover { background:rgba(255,255,255,.09);color:var(--text); }
+.icon-btn.del:hover { background:var(--coral-dim);color:var(--coral);border-color:rgba(255,107,107,.3); }
+.sub-progress-lbl { display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:5px; }
+.topics-list { margin-top:14px;display:flex;flex-direction:column;gap:5px;max-height:140px;overflow-y:auto; }
+.topic-item {
+  display:flex;align-items:center;gap:10px;
+  padding:7px 10px;border-radius:8px;
+  background:rgba(255,255,255,.03);
+  transition:background .18s;
+  cursor:pointer;
+}
+.topic-item:hover { background:rgba(255,255,255,.06); }
+.topic-check {
+  width:16px;height:16px;border-radius:5px;
+  border:1px solid var(--border2);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;transition:all .18s;
+  cursor:pointer;
+}
+.topic-check.done { background:var(--green);border-color:var(--green);color:#0d0f14; }
+.topic-name { font-size:12.5px;color:rgba(255,255,255,.7);flex:1; }
+.topic-name.done { text-decoration:line-through;color:var(--muted); }
+.add-topic-btn {
+  display:flex;align-items:center;gap:6px;
+  padding:7px 10px;border-radius:8px;
+  font-size:12px;color:var(--muted);
+  cursor:pointer;transition:all .18s;
+  margin-top:4px;border:1px dashed rgba(255,255,255,.12);
+  background:none;width:100%;
+}
+.add-topic-btn:hover { background:rgba(255,255,255,.04);color:var(--text);border-color:var(--gold); }
+
+/* ══════════════════════════════════════════
+   SCHEDULE PAGE
+══════════════════════════════════════════ */
+.schedule-config {
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:18px;padding:24px;margin-bottom:24px;
+}
+.config-title { font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#fff;margin-bottom:18px; }
+.config-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:16px; }
+.days-picker { display:flex;flex-wrap:wrap;gap:8px; }
+.day-toggle {
+  padding:8px 14px;border-radius:9px;
+  font-size:12.5px;font-weight:500;
+  background:rgba(255,255,255,.04);border:1px solid var(--border2);
+  color:var(--muted2);cursor:pointer;transition:all .18s;
+}
+.day-toggle.active { background:var(--gold-dim);border-color:rgba(245,197,66,.3);color:var(--gold); }
+
+.schedule-grid { display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:24px; }
+.sched-day {
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:14px;padding:14px 12px;min-height:120px;
+}
+.sched-day.active-day { border-color:rgba(245,197,66,.25);background:rgba(245,197,66,.04); }
+.sched-day.today { border-color:rgba(45,212,191,.3);box-shadow:0 0 20px rgba(45,212,191,.08); }
+.sched-day-name { font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px; }
+.sched-day-num { font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff;margin-bottom:10px; }
+.sched-day.today .sched-day-num { color:var(--teal); }
+.sched-subject-pill {
+  font-size:10.5px;font-weight:600;padding:4px 8px;border-radius:6px;
+  margin-bottom:4px;display:block;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+
+/* ══════════════════════════════════════════
+   QUESTIONS PAGE
+══════════════════════════════════════════ */
+.q-header { display:flex;align-items:center;gap:14px;margin-bottom:20px;flex-wrap:wrap; }
+.q-filter-group { display:flex;gap:8px;flex-wrap:wrap; }
+.q-filter {
+  padding:7px 14px;border-radius:9px;font-size:12.5px;font-weight:500;
+  background:rgba(255,255,255,.04);border:1px solid var(--border2);
+  color:var(--muted2);cursor:pointer;transition:all .18s;
+}
+.q-filter.active-all  { background:var(--gold-dim);border-color:rgba(245,197,66,.3);color:var(--gold); }
+.q-filter.active-ok   { background:var(--green-dim);border-color:rgba(74,222,128,.3);color:var(--green); }
+.q-filter.active-err  { background:var(--coral-dim);border-color:rgba(255,107,107,.3);color:var(--coral); }
+
+.q-session-card {
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:18px;margin-bottom:14px;overflow:hidden;
+  transition:border-color .2s;
+}
+.q-session-head {
+  display:flex;align-items:center;gap:14px;
+  padding:16px 20px;cursor:pointer;
+  transition:background .18s;
+}
+.q-session-head:hover { background:rgba(255,255,255,.02); }
+.q-sess-info { flex:1; }
+.q-sess-name { font-size:14px;font-weight:600;color:rgba(255,255,255,.85); }
+.q-sess-meta { font-size:12px;color:var(--muted);margin-top:3px; }
+.q-sess-stats { display:flex;gap:10px;align-items:center; }
+.q-stat { text-align:center; }
+.q-stat-val { font-family:'Syne',sans-serif;font-size:18px;font-weight:800; }
+.q-stat-lbl { font-size:10px;color:var(--muted);font-weight:300; }
+.q-list { border-top:1px solid var(--border);padding:14px 20px;display:flex;flex-direction:column;gap:8px; }
+.q-item {
+  display:flex;align-items:center;gap:12px;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:10px;padding:11px 14px;
+}
+.q-result {
+  width:28px;height:28px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;flex-shrink:0;
+}
+.q-result.ok  { background:var(--green-dim);color:var(--green); }
+.q-result.err { background:var(--coral-dim);color:var(--coral); }
+.q-text { font-size:12.5px;color:rgba(255,255,255,.7);flex:1; }
+.q-sub-badge { font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:6px; }
+
+/* SCORE RING */
+.score-ring-wrap { position:relative;width:60px;height:60px;flex-shrink:0; }
+.score-ring-wrap svg { transform:rotate(-90deg); }
+.score-ring-text { 
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-size:13px;font-weight:800;
+}
+
+/* ══════════════════════════════════════════
+   REVISION PAGE
+══════════════════════════════════════════ */
+.rev-card {
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:18px;padding:22px;margin-bottom:14px;
+  transition:all .2s;
+}
+.rev-card-header { display:flex;align-items:center;gap:14px;margin-bottom:14px; }
+.rev-card-icon { font-size:28px; }
+.rev-card-name { font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#fff; }
+.rev-card-meta { font-size:12px;color:var(--muted); }
+.rev-stages { display:flex;gap:8px;flex-wrap:wrap; }
+.rev-stage {
+  display:flex;align-items:center;gap:6px;
+  padding:7px 12px;border-radius:9px;font-size:12px;font-weight:500;
+  border:1px solid var(--border2);background:rgba(255,255,255,.04);
+  transition:all .18s;cursor:pointer;
+}
+.rev-stage.done { background:var(--green-dim);border-color:rgba(74,222,128,.3);color:var(--green); }
+.rev-stage.due  { background:var(--gold-dim);border-color:rgba(245,197,66,.3);color:var(--gold);animation:pulse 2s infinite; }
+.rev-stage.overdue { background:var(--coral-dim);border-color:rgba(255,107,107,.3);color:var(--coral); }
+.rev-stage.pending { color:var(--muted2); }
+
+/* EMPTY STATES */
+.empty-state {
+  text-align:center;padding:60px 20px;
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+}
+.empty-icon { font-size:52px;opacity:.4; }
+.empty-title { font-family:'Syne',sans-serif;font-size:18px;font-weight:700;color:rgba(255,255,255,.4); }
+.empty-sub { font-size:13px;color:var(--muted);max-width:300px; }
+
+/* INPUT SESSION */
+.session-form {
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:18px;padding:24px;margin-bottom:24px;
+}
+.q-input-row { display:flex;gap:10px;align-items:flex-end; }
+.q-btn-correct { background:var(--green-dim);border:1px solid rgba(74,222,128,.3);color:var(--green);font-weight:700; }
+.q-btn-correct:hover { background:rgba(74,222,128,.25); }
+.q-btn-wrong { background:var(--coral-dim);border:1px solid rgba(255,107,107,.3);color:var(--coral);font-weight:700; }
+.q-btn-wrong:hover { background:rgba(255,107,107,.25); }
+
+/* STUDY SESSION */
+.study-modal .modal { max-width:640px; }
+.topic-study-item {
+  display:flex;align-items:center;gap:12px;
+  background:rgba(255,255,255,.03);border:1px solid var(--border);
+  border-radius:10px;padding:12px 16px;margin-bottom:8px;
+  transition:all .18s;
+}
+.topic-done-check {
+  width:24px;height:24px;border-radius:7px;
+  border:2px solid var(--border2);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;cursor:pointer;transition:all .25s;
+}
+.topic-done-check.checked { background:var(--green);border-color:var(--green);color:#0d0f14;transform:scale(1.1); }
+</style>
+</head>
+<body>
+
+<!-- ═══ TOAST CONTAINER ═══ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="s-login" class="screen active">
+  <div class="login-noise"></div>
+  <div class="login-grid"></div>
+  <div class="login-card">
+    <div class="brand">
+      <div class="brand-icon">📚</div>
+      <span class="brand-name">StudyFlow</span>
+    </div>
+    <h1 class="login-title">Bom ver você!</h1>
+    <p class="login-sub">Seu concurso começa aqui. Organizado, focado e sem perder nenhum assunto.</p>
+    <div class="login-error" id="loginError"></div>
+    <div class="field">
+      <label>Nome de usuário</label>
+      <input type="text" id="loginUser" placeholder="seu.nome" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Senha</label>
+      <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn-cta" onclick="doLogin()">Entrar →</button>
+    <p class="login-switch">Primeira vez? <a href="#" onclick="showRegister()">Criar conta gratuita</a></p>
+  </div>
+</div>
+
+<!-- ═══ REGISTER MODAL ═══ -->
+<div class="modal-overlay" id="registerModal">
+  <div class="modal">
+    <div class="modal-title">Criar conta</div>
+    <div class="modal-sub">Seus dados ficam salvos localmente no seu navegador.</div>
+    <div class="form-group"><label class="form-label">Nome completo</label><input class="form-input" id="regName" placeholder="André Silva"></div>
+    <div class="form-group"><label class="form-label">Usuário</label><input class="form-input" id="regUser" placeholder="andre.silva"></div>
+    <div class="form-group"><label class="form-label">Senha</label><input class="form-input" type="password" id="regPass" placeholder="mínimo 4 caracteres"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('registerModal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="doRegister()">Criar conta</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="s-app" class="screen">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-brand-icon">📚</div>
+      <span class="sb-brand-name">StudyFlow</span>
+    </div>
+    <div class="nav-section">Estudo</div>
+    <div class="nav-item active" onclick="goPage('dashboard')"><span class="nav-icon">🏠</span>Dashboard</div>
+    <div class="nav-item" onclick="goPage('subjects')"><span class="nav-icon">📖</span>Matérias<span class="nav-badge" id="nb-subjects">0</span></div>
+    <div class="nav-item" onclick="goPage('schedule')"><span class="nav-icon">📅</span>Cronograma</div>
+    <div class="nav-section">Desempenho</div>
+    <div class="nav-item" onclick="goPage('questions')"><span class="nav-icon">🎯</span>Questões</div>
+    <div class="nav-item" onclick="goPage('revision')"><span class="nav-icon">🔁</span>Revisões<span class="nav-alert" id="nb-revisions" style="display:none">!</span></div>
+    <div class="sidebar-bottom">
+      <div class="user-chip">
+        <div class="avatar" id="sideAvatar">A</div>
+        <div class="user-info">
+          <div class="u-name" id="sideUserName">Usuário</div>
+          <div class="u-role">Concurseiro</div>
+        </div>
+        <button class="logout-btn" onclick="doLogout()" title="Sair">⏏</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- ── DASHBOARD ── -->
+    <div id="page-dashboard" class="page active">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">Dashboard 👋</div>
+          <div class="page-sub" id="dash-greeting">Hoje é um ótimo dia para estudar.</div>
+        </div>
+        <button class="btn btn-primary" onclick="openStudySession()">▶ Estudar agora</button>
+      </div>
+
+      <!-- Countdown -->
+      <div class="exam-countdown" id="examCountdown">
+        <div class="countdown-left">
+          <div class="ec-label">📋 Concurso</div>
+          <div class="ec-name" id="cd-examName">Nenhum concurso configurado</div>
+          <div class="ec-date" id="cd-examDate">Configure na aba Cronograma</div>
+        </div>
+        <div class="countdown-right">
+          <div class="days-num" id="cd-days">—</div>
+          <div class="days-lbl">dias restantes</div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-c sc-gold">
+          <div class="stat-icon">📖</div>
+          <div class="stat-val" id="st-subjects">0</div>
+          <div class="stat-lbl">Matérias cadastradas</div>
+          <div class="stat-sub sub-up" id="st-topics-done">0 tópicos concluídos</div>
+        </div>
+        <div class="stat-c sc-teal">
+          <div class="stat-icon">✅</div>
+          <div class="stat-val" id="st-progress">0%</div>
+          <div class="stat-lbl">Progresso geral</div>
+          <div class="progress" style="margin-top:8px"><div class="progress-fill pf-teal" id="st-progress-bar" style="width:0%"></div></div>
+        </div>
+        <div class="stat-c sc-coral">
+          <div class="stat-icon">🎯</div>
+          <div class="stat-val" id="st-accuracy">—</div>
+          <div class="stat-lbl">Taxa de acerto</div>
+          <div class="stat-sub" id="st-questions-total">0 questões respondidas</div>
+        </div>
+        <div class="stat-c sc-violet">
+          <div class="stat-icon">🔁</div>
+          <div class="stat-val" id="st-revisions">0</div>
+          <div class="stat-lbl">Revisões pendentes</div>
+          <div class="stat-sub sub-warn" id="st-rev-today">0 para hoje</div>
+        </div>
+      </div>
+
+      <!-- Today -->
+      <div class="today-card">
+        <div class="today-title">📅 Para estudar hoje <span id="today-date-badge" class="badge b-teal" style="font-size:11px"></span></div>
+        <div class="today-subjects" id="todaySubjects">
+          <div class="empty-state" style="padding:20px">
+            <div class="empty-icon" style="font-size:32px">📅</div>
+            <div class="empty-title" style="font-size:14px">Configure seu cronograma</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Revision alerts -->
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">🔁 Revisões Urgentes</span>
+          <button class="btn btn-ghost btn-sm" onclick="goPage('revision')">Ver todas</button>
+        </div>
+        <div style="padding:16px" id="dashRevisions">
+          <div class="empty-state" style="padding:20px">
+            <div class="empty-icon" style="font-size:30px">✨</div>
+            <div class="empty-title" style="font-size:13px">Nenhuma revisão urgente</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SUBJECTS ── -->
+    <div id="page-subjects" class="page">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">Matérias</div>
+          <div class="page-sub">Cadastre cada matéria e seus tópicos</div>
+        </div>
+        <button class="btn btn-primary" onclick="openAddSubject()">＋ Nova Matéria</button>
+      </div>
+      <div class="subjects-grid" id="subjectsGrid">
+        <div class="empty-state" style="grid-column:1/-1">
+          <div class="empty-icon">📖</div>
+          <div class="empty-title">Nenhuma matéria ainda</div>
+          <div class="empty-sub">Clique em "+ Nova Matéria" para começar a organizar seus estudos.</div>
+          <button class="btn btn-primary" style="margin-top:8px" onclick="openAddSubject()">＋ Adicionar Matéria</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SCHEDULE ── -->
+    <div id="page-schedule" class="page">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">Cronograma</div>
+          <div class="page-sub">Configure seus dias e distribua as matérias automaticamente</div>
+        </div>
+        <button class="btn btn-primary" onclick="generateSchedule()">⚡ Gerar Cronograma</button>
+      </div>
+
+      <div class="schedule-config">
+        <div class="config-title">⚙️ Configurar Concurso</div>
+        <div class="config-grid">
+          <div class="form-group">
+            <label class="form-label">Nome do concurso</label>
+            <input class="form-input" id="cfg-examName" placeholder="Ex: SEFAZ-AL 2026">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Data da prova</label>
+            <input class="form-input" type="date" id="cfg-examDate">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Horas por dia de estudo</label>
+            <select class="form-select" id="cfg-hours">
+              <option value="1">1 hora</option>
+              <option value="1.5">1,5 hora</option>
+              <option value="2" selected>2 horas</option>
+              <option value="3">3 horas</option>
+              <option value="4">4 horas</option>
+              <option value="5">5 horas</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:4px">
+          <label class="form-label">Dias de estudo por semana</label>
+          <div class="days-picker" id="daysPicker">
+            <div class="day-toggle active" data-day="1">Seg</div>
+            <div class="day-toggle active" data-day="2">Ter</div>
+            <div class="day-toggle active" data-day="3">Qua</div>
+            <div class="day-toggle active" data-day="4">Qui</div>
+            <div class="day-toggle active" data-day="5">Sex</div>
+            <div class="day-toggle active" data-day="6">Sáb</div>
+            <div class="day-toggle" data-day="0">Dom</div>
+          </div>
+        </div>
+        <button class="btn btn-teal" style="margin-top:8px" onclick="saveConfig()">💾 Salvar Configuração</button>
+      </div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-head"><span class="card-title">📅 Próximas 2 Semanas</span></div>
+        <div style="padding:16px">
+          <div class="schedule-grid" id="scheduleGrid">
+            <div class="empty-state" style="grid-column:1/-1;padding:30px">
+              <div class="empty-icon">⚡</div>
+              <div class="empty-title">Gere o cronograma</div>
+              <div class="empty-sub">Configure o concurso e clique em "Gerar Cronograma".</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── QUESTIONS ── -->
+    <div id="page-questions" class="page">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">Questões</div>
+          <div class="page-sub">Registre seus acertos e erros por sessão</div>
+        </div>
+      </div>
+
+      <!-- New session form -->
+      <div class="session-form">
+        <div class="card-title" style="margin-bottom:16px">➕ Nova Sessão de Questões</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Matéria</label>
+            <select class="form-select" id="q-subject">
+              <option value="">Selecione a matéria...</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Tópico (opcional)</label>
+            <input class="form-input" id="q-topic" placeholder="Ex: Normalização">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Observação (opcional)</label>
+          <input class="form-input" id="q-note" placeholder="Ex: Simulado Gran Cursos — Prova 3">
+        </div>
+        <div class="q-input-row">
+          <div class="form-group" style="flex:1;margin-bottom:0">
+            <label class="form-label">Total de questões</label>
+            <input class="form-input" type="number" id="q-total" placeholder="10" min="1" max="200">
+          </div>
+          <div class="form-group" style="flex:1;margin-bottom:0">
+            <label class="form-label">Acertos</label>
+            <input class="form-input" type="number" id="q-correct" placeholder="7" min="0" max="200">
+          </div>
+          <button class="btn btn-primary" style="align-self:flex-end;height:46px" onclick="addQSession()">Registrar</button>
+        </div>
+      </div>
+
+      <!-- Filter -->
+      <div class="q-header">
+        <div class="q-filter-group">
+          <button class="q-filter active-all" onclick="filterQ('all', this)">Todos</button>
+          <button class="q-filter" onclick="filterQ('ok', this)">✅ Acima de 70%</button>
+          <button class="q-filter" onclick="filterQ('err', this)">❌ Abaixo de 70%</button>
+        </div>
+        <select class="form-select" id="q-filter-sub" style="width:200px;padding:8px 12px" onchange="renderQSessions()">
+          <option value="">Todas as matérias</option>
+        </select>
+      </div>
+
+      <div id="qSessionsList"></div>
+    </div>
+
+    <!-- ── REVISION ── -->
+    <div id="page-revision" class="page">
+      <div class="page-hd">
+        <div>
+          <div class="page-title">Revisão Espaçada</div>
+          <div class="page-sub">Ciclo: estudo → revisão em 3 dias → revisão em 7 dias → revisão em 14 dias</div>
+        </div>
+      </div>
+
+      <div id="revisionList"></div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Add Subject -->
+<div class="modal-overlay" id="addSubjectModal">
+  <div class="modal">
+    <div class="modal-title">Nova Matéria</div>
+    <div class="modal-sub">Adicione a matéria e seus tópicos de estudo.</div>
+    <div class="form-group"><label class="form-label">Nome da matéria</label><input class="form-input" id="sub-name" placeholder="Ex: Banco de Dados"></div>
+    <div class="form-group">
+      <label class="form-label">Cor de identificação</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap" id="colorPicker">
+        <div class="color-swatch" data-color="#f5c542" style="width:28px;height:28px;border-radius:7px;background:#f5c542;cursor:pointer;border:2px solid transparent;transition:all .18s"></div>
+        <div class="color-swatch" data-color="#2dd4bf" style="width:28px;height:28px;border-radius:7px;background:#2dd4bf;cursor:pointer;border:2px solid transparent;transition:all .18s"></div>
+        <div class="color-swatch" data-color="#ff6b6b" style="width:28px;height:28px;border-radius:7px;background:#ff6b6b;cursor:pointer;border:2px solid transparent;transition:all .18s"></div>
+        <div class="color-swatch" data-color="#a78bfa" style="width:28px;height:28px;border-radius:7px;background:#a78bfa;cursor:pointer;border:2px solid transparent;transition:all .18s"></div>
+        <div class="color-swatch" data-color="#4ade80" style="width:28px;height:28px;border-radius:7px;background:#4ade80;cursor:pointer;border:2px solid transparent;transition:all .18s"></div>
+        <div class="color-swatch" data-color="#fb923c" style="width:28px;height:28px;border-radius:7px;background:#fb923c;cursor:pointer;border:2px solid transparent;transition:all .18s"></div>
+        <div class="color-swatch" data-color="#38bdf8" style="width:28px;height:28px;border-radius:7px;background:#38bdf8;cursor:pointer;border:2px solid transparent;transition:all .18s"></div>
+        <div class="color-swatch" data-color="#f472b6" style="width:28px;height:28px;border-radius:7px;background:#f472b6;cursor:pointer;border:2px solid transparent;transition:all .18s"></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tópicos (um por linha)</label>
+      <textarea class="form-textarea" id="sub-topics" rows="5" placeholder="Ex:&#10;Modelo Entidade-Relacionamento&#10;Normalização (1FN, 2FN, 3FN)&#10;SQL - SELECT, JOIN, GROUP BY&#10;Índices e Performance&#10;Transações e ACID"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('addSubjectModal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveSubject()">Salvar Matéria</button>
+    </div>
+  </div>
+</div>
+
+<!-- Study Session -->
+<div class="modal-overlay study-modal" id="studySessionModal">
+  <div class="modal" style="max-width:580px">
+    <div class="modal-title">▶ Sessão de Estudo</div>
+    <div class="modal-sub" id="study-date-label">Registre o que você estudou hoje e marque os tópicos.</div>
+    <div class="form-group">
+      <label class="form-label">Matéria estudada</label>
+      <select class="form-select" id="study-subject" onchange="loadStudyTopics()">
+        <option value="">Selecione...</option>
+      </select>
+    </div>
+    <div id="studyTopicsList" style="margin-bottom:16px;max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:6px"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('studySessionModal')">Fechar</button>
+      <button class="btn btn-primary" onclick="confirmStudySession()">✅ Marcar como Estudado</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+//  DATABASE (localStorage)
+// ══════════════════════════════════════════════════════════════
+const DB = {
+  get: (k, def=[]) => { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch { return def; } },
+  set: (k, v)       => localStorage.setItem(k, JSON.stringify(v)),
+  del: (k)           => localStorage.removeItem(k),
+};
+
+// Current user scope
+let CU = null; // current user object
+function dbKey(k) { return `sf_${CU.username}_${k}`; }
+function getData(k, def=[])  { return DB.get(dbKey(k), def); }
+function setData(k, v)       { return DB.set(dbKey(k), v); }
+
+// ── AUTH ──
+function getUsers() { return DB.get('sf_users', []); }
+function saveUsers(u) { return DB.set('sf_users', u); }
+
+function doLogin() {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value.trim();
+  const err  = document.getElementById('loginError');
+  if (!user || !pass) { showErr(err, 'Preencha usuário e senha.'); return; }
+  const users = getUsers();
+  const found = users.find(u => u.username === user && u.password === simpleHash(pass));
+  if (!found) { showErr(err, 'Usuário ou senha incorretos.'); return; }
+  err.style.display='none';
+  CU = found;
+  launchApp();
+}
+
+function doRegister() {
+  const name = document.getElementById('regName').value.trim();
+  const user = document.getElementById('regUser').value.trim();
+  const pass = document.getElementById('regPass').value.trim();
+  if (!name||!user||!pass) { toast('Preencha todos os campos.','error'); return; }
+  if (pass.length < 4)     { toast('Senha muito curta (mín. 4 caracteres).','error'); return; }
+  const users = getUsers();
+  if (users.find(u => u.username === user)) { toast('Usuário já existe.','error'); return; }
+  const newUser = { id: Date.now(), name, username: user, password: simpleHash(pass) };
+  users.push(newUser);
+  saveUsers(users);
+  CU = newUser;
+  closeModal('registerModal');
+  launchApp();
+  toast('Conta criada! Bem-vindo, '+name+'! 🎉','success');
+}
+
+function doLogout() {
+  CU = null;
+  showScreen('s-login');
+  document.getElementById('loginPass').value = '';
+}
+
+function simpleHash(s) {
+  let h = 0;
+  for (let i=0; i<s.length; i++) h = Math.imul(31,h)+s.charCodeAt(i)|0;
+  return h.toString(36);
+}
+
+function showErr(el, msg) { el.textContent = msg; el.style.display='block'; }
+function showRegister() { openModal('registerModal'); }
+
+// ── APP INIT ──
+function launchApp() {
+  document.getElementById('sideAvatar').textContent = CU.name[0].toUpperCase();
+  document.getElementById('sideUserName').textContent = CU.name;
+  loadConfig();
+  showScreen('s-app');
+  goPage('dashboard');
+  refreshAll();
+}
+
+function refreshAll() {
+  updateDashboard();
+  renderSubjects();
+  renderSchedule();
+  renderQSessions();
+  renderRevisions();
+  updateNavBadges();
+  populateSubjectSelects();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  NAV
+// ══════════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelector(`.nav-item[onclick="goPage('${id}')"]`)?.classList.add('active');
+  if (id==='dashboard') updateDashboard();
+  if (id==='subjects')  renderSubjects();
+  if (id==='schedule')  renderSchedule();
+  if (id==='questions') { renderQSessions(); populateSubjectSelects(); }
+  if (id==='revision')  renderRevisions();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SUBJECTS
+// ══════════════════════════════════════════════════════════════
+let selectedColor = '#f5c542';
+let editingSubjectId = null;
+
+function openAddSubject(id=null) {
+  editingSubjectId = id;
+  if (id) {
+    const subs = getData('subjects');
+    const s = subs.find(x=>x.id===id);
+    if (!s) return;
+    document.getElementById('sub-name').value = s.name;
+    document.getElementById('sub-topics').value = s.topics.map(t=>t.name).join('\n');
+    selectedColor = s.color;
+    document.querySelector('.modal-title').textContent = 'Editar Matéria';
+  } else {
+    document.getElementById('sub-name').value = '';
+    document.getElementById('sub-topics').value = '';
+    selectedColor = '#f5c542';
+    document.querySelector('.modal-title').textContent = 'Nova Matéria';
+  }
+  updateColorSwatches();
+  openModal('addSubjectModal');
+}
+
+document.querySelectorAll('.color-swatch').forEach(s => {
+  s.addEventListener('click', () => { selectedColor = s.dataset.color; updateColorSwatches(); });
+});
+function updateColorSwatches() {
+  document.querySelectorAll('.color-swatch').forEach(s => {
+    s.style.border = s.dataset.color === selectedColor ? '2px solid white' : '2px solid transparent';
+    s.style.transform = s.dataset.color === selectedColor ? 'scale(1.2)' : 'scale(1)';
+  });
+}
+
+function saveSubject() {
+  const name = document.getElementById('sub-name').value.trim();
+  const rawTopics = document.getElementById('sub-topics').value;
+  if (!name) { toast('Informe o nome da matéria.','error'); return; }
+  const topicNames = rawTopics.split('\n').map(t=>t.trim()).filter(Boolean);
+  const subs = getData('subjects');
+
+  if (editingSubjectId) {
+    const idx = subs.findIndex(x=>x.id===editingSubjectId);
+    if (idx>-1) {
+      const old = subs[idx];
+      // preserve existing topic completion status
+      const oldTopicMap = {};
+      old.topics.forEach(t => oldTopicMap[t.name] = t);
+      subs[idx] = {
+        ...old, name, color: selectedColor,
+        topics: topicNames.map(n => oldTopicMap[n] || { id: Date.now()+Math.random(), name: n, done: false, doneAt: null })
+      };
+    }
+  } else {
+    subs.push({
+      id: Date.now(),
+      name, color: selectedColor,
+      topics: topicNames.map(n => ({ id: Date.now()+Math.random(), name: n, done: false, doneAt: null })),
+      createdAt: new Date().toISOString()
+    });
+  }
+  setData('subjects', subs);
+  closeModal('addSubjectModal');
+  renderSubjects();
+  updateNavBadges();
+  populateSubjectSelects();
+  updateDashboard();
+  generateSchedule(true);
+  toast(editingSubjectId ? 'Matéria atualizada!' : 'Matéria adicionada! 📖','success');
+}
+
+function deleteSubject(id) {
+  if (!confirm('Excluir esta matéria e todos os seus tópicos?')) return;
+  let subs = getData('subjects');
+  subs = subs.filter(s=>s.id!==id);
+  setData('subjects', subs);
+  renderSubjects();
+  updateNavBadges();
+  populateSubjectSelects();
+  updateDashboard();
+  toast('Matéria removida.','info');
+}
+
+function toggleTopic(subId, topicId) {
+  const subs = getData('subjects');
+  const sub = subs.find(s=>s.id===subId);
+  if (!sub) return;
+  const t = sub.topics.find(t=>t.id===topicId);
+  if (!t) return;
+  t.done = !t.done;
+  t.doneAt = t.done ? new Date().toISOString() : null;
+  // If marked done, create revision entries
+  if (t.done) createRevisionEntries(sub.name, t.name, topicId, subId);
+  setData('subjects', subs);
+  renderSubjects();
+  updateDashboard();
+  updateNavBadges();
+  toast(t.done ? '✅ Tópico concluído! Revisão agendada.' : 'Tópico desmarcado.', t.done?'success':'info');
+}
+
+function renderSubjects() {
+  const subs = getData('subjects');
+  const grid = document.getElementById('subjectsGrid');
+  if (!subs.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <div class="empty-icon">📖</div>
+      <div class="empty-title">Nenhuma matéria ainda</div>
+      <div class="empty-sub">Clique em "+ Nova Matéria" para começar.</div>
+      <button class="btn btn-primary" style="margin-top:8px" onclick="openAddSubject()">＋ Adicionar Matéria</button>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = subs.map(s => {
+    const done = s.topics.filter(t=>t.done).length;
+    const total = s.topics.length;
+    const pct = total ? Math.round(done/total*100) : 0;
+    const pf = pct>=70?'pf-green':pct>=40?'pf-gold':'pf-coral';
+    return `<div class="subject-card fade">
+      <div class="sub-color-bar" style="background:${s.color}"></div>
+      <div class="sub-header">
+        <div>
+          <div class="sub-name">${s.name}</div>
+          <div class="sub-count">${total} tópico${total!==1?'s':''} • ${done} concluído${done!==1?'s':''}</div>
+        </div>
+        <div class="sub-actions">
+          <div class="icon-btn" onclick="openAddSubject(${s.id})" title="Editar">✏️</div>
+          <div class="icon-btn del" onclick="deleteSubject(${s.id})" title="Excluir">🗑️</div>
+        </div>
+      </div>
+      <div class="sub-progress-lbl">
+        <span style="font-size:11px;color:var(--muted2)">Progresso</span>
+        <span style="font-size:11px;font-weight:700;color:${s.color}">${pct}%</span>
+      </div>
+      <div class="progress"><div class="progress-fill ${pf}" style="width:${pct}%"></div></div>
+      <div class="topics-list">
+        ${s.topics.map(t=>`
+          <div class="topic-item" onclick="toggleTopic(${s.id},${t.id})">
+            <div class="topic-check ${t.done?'done':''}">${t.done?'✓':''}</div>
+            <span class="topic-name ${t.done?'done':''}">${t.name}</span>
+            ${t.done?`<span style="font-size:10px;color:var(--muted)">${fmtDate(t.doneAt)}</span>`:''}
+          </div>`).join('')}
+      </div>
+      <button class="add-topic-btn" onclick="quickAddTopic(${s.id})">＋ Adicionar tópico</button>
+    </div>`;
+  }).join('');
+}
+
+function quickAddTopic(subId) {
+  const name = prompt('Nome do tópico:');
+  if (!name?.trim()) return;
+  const subs = getData('subjects');
+  const sub = subs.find(s=>s.id===subId);
+  if (!sub) return;
+  sub.topics.push({ id: Date.now(), name: name.trim(), done: false, doneAt: null });
+  setData('subjects', subs);
+  renderSubjects();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  SCHEDULE
+// ══════════════════════════════════════════════════════════════
+let activeDays = [1,2,3,4,5,6];
+
+function loadConfig() {
+  const cfg = getData('config', {});
+  if (cfg.examName) document.getElementById('cfg-examName').value = cfg.examName;
+  if (cfg.examDate) document.getElementById('cfg-examDate').value = cfg.examDate;
+  if (cfg.hours)    document.getElementById('cfg-hours').value = cfg.hours;
+  if (cfg.days)     activeDays = cfg.days;
+  document.querySelectorAll('.day-toggle').forEach(d => {
+    d.classList.toggle('active', activeDays.includes(parseInt(d.dataset.day)));
+  });
+}
+
+document.querySelectorAll('.day-toggle').forEach(d => {
+  d.addEventListener('click', () => {
+    const day = parseInt(d.dataset.day);
+    if (activeDays.includes(day)) {
+      if (activeDays.length === 1) { toast('Selecione ao menos 1 dia.','error'); return; }
+      activeDays = activeDays.filter(x=>x!==day);
+    } else {
+      activeDays.push(day);
+    }
+    d.classList.toggle('active', activeDays.includes(day));
+  });
+});
+
+function saveConfig() {
+  const cfg = {
+    examName: document.getElementById('cfg-examName').value.trim(),
+    examDate: document.getElementById('cfg-examDate').value,
+    hours:    document.getElementById('cfg-hours').value,
+    days:     activeDays
+  };
+  setData('config', cfg);
+  toast('Configuração salva! ✅','success');
+  updateDashboard();
+  generateSchedule();
+}
+
+function generateSchedule(silent=false) {
+  const subs = getData('subjects');
+  const cfg  = getData('config', {});
+  if (!subs.length) {
+    if (!silent) toast('Cadastre matérias primeiro.','error');
+    renderScheduleGrid([]);
+    return;
+  }
+  if (!activeDays.length) { toast('Selecione pelo menos 1 dia.','error'); return; }
+
+  // Build 14-day schedule
+  const schedule = [];
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  let subIdx = 0;
+  const subNames = subs.map(s=>({name:s.name,color:s.color}));
+
+  for (let i=0; i<14; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate()+i);
+    const dow = d.getDay(); // 0=Sun
+    const entry = { date: new Date(d), subjects: [] };
+    if (activeDays.includes(dow)) {
+      // Assign 1-2 subjects per study day, cycling
+      const perDay = subs.length <= activeDays.length ? 1 : Math.ceil(subs.length / activeDays.length);
+      for (let j=0; j<Math.min(perDay,2); j++) {
+        entry.subjects.push(subNames[subIdx % subNames.length]);
+        subIdx++;
+      }
+    }
+    schedule.push(entry);
+  }
+
+  setData('schedule', schedule.map(e=>({date:e.date.toISOString(),subjects:e.subjects})));
+  renderScheduleGrid(schedule);
+  if (!silent) toast('Cronograma gerado! 📅','success');
+}
+
+function renderScheduleGrid(schedule) {
+  const grid = document.getElementById('scheduleGrid');
+  const dayNames = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  if (!schedule.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;padding:30px">
+      <div class="empty-icon">⚡</div>
+      <div class="empty-title">Gere o cronograma</div>
+      <div class="empty-sub">Configure o concurso e clique em "Gerar Cronograma".</div>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = schedule.map(e => {
+    const d = new Date(e.date || e);
+    const isToday = d.toDateString() === today.toDateString();
+    const hasStudy = e.subjects?.length > 0;
+    return `<div class="sched-day ${hasStudy?'active-day':''} ${isToday?'today':''}">
+      <div class="sched-day-name">${dayNames[d.getDay()]}</div>
+      <div class="sched-day-num">${d.getDate()}</div>
+      ${e.subjects?.map(s=>`
+        <span class="sched-subject-pill" style="background:${s.color}22;color:${s.color};border:1px solid ${s.color}44">${s.name}</span>
+      `).join('') || '<span style="font-size:10px;color:var(--muted)">—</span>'}
+    </div>`;
+  }).join('');
+}
+
+function renderSchedule() {
+  loadConfig();
+  const sched = getData('schedule',[]);
+  if (sched.length) {
+    renderScheduleGrid(sched.map(e=>({...e,date:new Date(e.date)})));
+  } else {
+    renderScheduleGrid([]);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  QUESTIONS
+// ══════════════════════════════════════════════════════════════
+let qFilter = 'all';
+
+function addQSession() {
+  const subId  = document.getElementById('q-subject').value;
+  const topic  = document.getElementById('q-topic').value.trim();
+  const note   = document.getElementById('q-note').value.trim();
+  const total  = parseInt(document.getElementById('q-total').value);
+  const correct= parseInt(document.getElementById('q-correct').value);
+
+  if (!subId)              { toast('Selecione a matéria.','error'); return; }
+  if (!total || total<1)  { toast('Informe o total de questões.','error'); return; }
+  if (isNaN(correct) || correct<0 || correct>total) { toast('Acertos inválidos.','error'); return; }
+
+  const subs = getData('subjects');
+  const sub = subs.find(s=>s.id==subId);
+  const sessions = getData('q_sessions', []);
+
+  sessions.push({
+    id: Date.now(),
+    subjectId: parseInt(subId),
+    subjectName: sub?.name || '?',
+    subjectColor: sub?.color || '#f5c542',
+    topic, note, total, correct,
+    wrong: total-correct,
+    pct: Math.round(correct/total*100),
+    date: new Date().toISOString()
+  });
+  setData('q_sessions', sessions);
+
+  document.getElementById('q-topic').value = '';
+  document.getElementById('q-note').value = '';
+  document.getElementById('q-total').value = '';
+  document.getElementById('q-correct').value = '';
+
+  renderQSessions();
+  updateDashboard();
+  const pct = Math.round(correct/total*100);
+  toast(`${pct}% de acerto — ${pct>=70?'Ótimo! 🎉':'Continue praticando! 💪'}`, pct>=70?'success':'info');
+}
+
+function filterQ(f, btn) {
+  qFilter = f;
+  document.querySelectorAll('.q-filter').forEach(b=>b.className='q-filter');
+  btn.classList.add(`active-${f}`);
+  renderQSessions();
+}
+
+function renderQSessions() {
+  const sessions = getData('q_sessions',[]);
+  const filterSub = document.getElementById('q-filter-sub')?.value || '';
+  let filtered = sessions;
+  if (filterSub) filtered = filtered.filter(s=>s.subjectId==filterSub);
+  if (qFilter==='ok')  filtered = filtered.filter(s=>s.pct>=70);
+  if (qFilter==='err') filtered = filtered.filter(s=>s.pct<70);
+  filtered = filtered.slice().reverse();
+
+  const container = document.getElementById('qSessionsList');
+  if (!filtered.length) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">🎯</div>
+      <div class="empty-title">Nenhuma sessão encontrada</div>
+      <div class="empty-sub">Registre suas questões acima.</div></div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(s => {
+    const pct = s.pct;
+    const col = pct>=70?'var(--green)':pct>=50?'var(--gold)':'var(--coral)';
+    const circ = scoreRing(pct, col);
+    return `<div class="q-session-card fade">
+      <div class="q-session-head">
+        <div class="score-ring-wrap">${circ}</div>
+        <div class="q-sess-info">
+          <div class="q-sess-name">${s.subjectName}${s.topic?' — <span style="font-weight:400;color:var(--muted2)">'+s.topic+'</span>':''}</div>
+          <div class="q-sess-meta">${s.note ? s.note+' • ':''} ${fmtDate(s.date)}</div>
+        </div>
+        <div class="q-sess-stats">
+          <div class="q-stat"><div class="q-stat-val" style="color:var(--green)">${s.correct}</div><div class="q-stat-lbl">acertos</div></div>
+          <div class="q-stat"><div class="q-stat-val" style="color:var(--coral)">${s.wrong}</div><div class="q-stat-lbl">erros</div></div>
+          <div class="q-stat"><div class="q-stat-val" style="color:var(--muted2)">${s.total}</div><div class="q-stat-lbl">total</div></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function scoreRing(pct, color) {
+  const r = 24, circ = 2*Math.PI*r;
+  const fill = circ*(1-pct/100);
+  return `<svg width="60" height="60" viewBox="0 0 60 60">
+    <circle cx="30" cy="30" r="${r}" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="5"/>
+    <circle cx="30" cy="30" r="${r}" fill="none" stroke="${color}" stroke-width="5"
+      stroke-dasharray="${circ}" stroke-dashoffset="${fill}" stroke-linecap="round"
+      style="transition:stroke-dashoffset .6s ease"/>
+  </svg>
+  <div class="score-ring-text" style="color:${color}">${pct}%</div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+//  REVISION (Spaced Repetition: 3, 7, 14 days)
+// ══════════════════════════════════════════════════════════════
+const REV_DAYS = [3, 7, 14];
+
+function createRevisionEntries(subName, topicName, topicId, subId) {
+  const revs = getData('revisions', []);
+  // Remove old entries for this topic
+  const filtered = revs.filter(r=>r.topicId!==topicId);
+  const studiedAt = new Date();
+  REV_DAYS.forEach((d,i) => {
+    const due = new Date(studiedAt);
+    due.setDate(studiedAt.getDate()+d);
+    filtered.push({
+      id: Date.now()+i,
+      subjectId: subId,
+      subjectName: subName,
+      topicId, topicName,
+      stage: i+1, // 1=3d, 2=7d, 3=14d
+      dueDate: due.toISOString(),
+      done: false,
+      studiedAt: studiedAt.toISOString()
+    });
+  });
+  setData('revisions', filtered);
+}
+
+function markRevisionDone(id) {
+  const revs = getData('revisions', []);
+  const r = revs.find(x=>x.id===id);
+  if (r) { r.done = true; r.doneAt = new Date().toISOString(); }
+  setData('revisions', revs);
+  renderRevisions();
+  updateDashboard();
+  updateNavBadges();
+  toast('Revisão concluída! 🧠','success');
+}
+
+function renderRevisions() {
+  const revs = getData('revisions', []);
+  const today = new Date(); today.setHours(23,59,59,999);
+  const container = document.getElementById('revisionList');
+
+  // Group by topic
+  const byTopic = {};
+  revs.forEach(r => {
+    const k = r.topicId;
+    if (!byTopic[k]) byTopic[k] = { subjectName: r.subjectName, topicName: r.topicName, stages: [] };
+    byTopic[k].stages.push(r);
+  });
+
+  const keys = Object.keys(byTopic);
+  if (!keys.length) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">🔁</div>
+      <div class="empty-title">Nenhuma revisão agendada</div>
+      <div class="empty-sub">Marque tópicos como concluídos para gerar revisões automáticas com espaçamento de 3, 7 e 14 dias.</div>
+    </div>`;
+    return;
+  }
+
+  container.innerHTML = keys.map(k => {
+    const group = byTopic[k];
+    const stageLabels = ['Revisão 1 (3 dias)','Revisão 2 (7 dias)','Revisão 3 (14 dias)'];
+    const stages = group.stages.sort((a,b)=>a.stage-b.stage);
+    return `<div class="rev-card fade">
+      <div class="rev-card-header">
+        <div class="rev-card-icon">📝</div>
+        <div>
+          <div class="rev-card-name">${group.topicName}</div>
+          <div class="rev-card-meta">${group.subjectName}</div>
+        </div>
+      </div>
+      <div class="rev-stages">
+        ${stages.map(s => {
+          const due = new Date(s.dueDate);
+          const isOverdue = !s.done && due < new Date();
+          const isDue = !s.done && !isOverdue && due <= today;
+          const cls = s.done?'done':isOverdue?'overdue':isDue?'due':'pending';
+          const lbl = stageLabels[s.stage-1];
+          return `<div class="rev-stage ${cls}" onclick="${!s.done?`markRevisionDone(${s.id})`:''}">
+            ${s.done?'✅':isOverdue?'⚠️':isDue?'⏰':'🕐'} ${lbl}
+            <span style="opacity:.6;font-size:10px">${s.done?'Feita':fmtDate(s.dueDate)}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  DASHBOARD
+// ══════════════════════════════════════════════════════════════
+function updateDashboard() {
+  const subs    = getData('subjects',[]);
+  const cfg     = getData('config',{});
+  const sessions= getData('q_sessions',[]);
+  const revs    = getData('revisions',[]);
+  const sched   = getData('schedule',[]);
+  const today   = new Date();
+  today.setHours(0,0,0,0);
+
+  // greeting
+  const h = new Date().getHours();
+  const gr = h<12?'Bom dia':h<18?'Boa tarde':'Boa noite';
+  document.getElementById('dash-greeting').textContent = `${gr}, ${CU.name.split(' ')[0]}! Hoje é um ótimo dia para estudar.`;
+
+  // countdown
+  if (cfg.examName && cfg.examDate) {
+    const examD = new Date(cfg.examDate+'T00:00:00');
+    const diff = Math.ceil((examD-today)/(1000*60*60*24));
+    document.getElementById('cd-examName').textContent = cfg.examName;
+    document.getElementById('cd-examDate').textContent = `Data: ${examD.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'})}`;
+    document.getElementById('cd-days').textContent = diff>0?diff:'🚨';
+  }
+
+  // stats
+  const totalTopics = subs.reduce((a,s)=>a+s.topics.length,0);
+  const doneTopics  = subs.reduce((a,s)=>a+s.topics.filter(t=>t.done).length,0);
+  const pct = totalTopics?Math.round(doneTopics/totalTopics*100):0;
+  document.getElementById('st-subjects').textContent = subs.length;
+  document.getElementById('st-topics-done').textContent = `${doneTopics}/${totalTopics} tópicos concluídos`;
+  document.getElementById('st-progress').textContent = pct+'%';
+  document.getElementById('st-progress-bar').style.width = pct+'%';
+
+  const totalQ   = sessions.reduce((a,s)=>a+s.total,0);
+  const correctQ = sessions.reduce((a,s)=>a+s.correct,0);
+  const acc = totalQ?Math.round(correctQ/totalQ*100):null;
+  document.getElementById('st-accuracy').textContent = acc!==null?acc+'%':'—';
+  document.getElementById('st-questions-total').textContent = `${totalQ} questões respondidas`;
+  const accEl = document.getElementById('st-accuracy').nextElementSibling;
+
+  // pending revisions
+  const todayEnd = new Date(); todayEnd.setHours(23,59,59,999);
+  const pendingRevs = revs.filter(r=>!r.done && new Date(r.dueDate)<=todayEnd);
+  const overdueRevs = revs.filter(r=>!r.done && new Date(r.dueDate)<today);
+  document.getElementById('st-revisions').textContent = revs.filter(r=>!r.done).length;
+  document.getElementById('st-rev-today').textContent = `${pendingRevs.length} para hoje`;
+
+  // today badge
+  const dayNames=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  document.getElementById('today-date-badge').textContent = dayNames[new Date().getDay()]+', '+new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
+
+  // today subjects from schedule
+  const todayEntry = sched.find(e => new Date(e.date).toDateString() === today.toDateString());
+  const todaySubs = todayEntry?.subjects || [];
+  const todayEl = document.getElementById('todaySubjects');
+  if (todaySubs.length) {
+    todayEl.innerHTML = todaySubs.map(ts => {
+      const fullSub = subs.find(s=>s.name===ts.name);
+      const done = fullSub?.topics.filter(t=>t.done).length||0;
+      const total = fullSub?.topics.length||0;
+      const p = total?Math.round(done/total*100):0;
+      return `<div class="today-sub-card" onclick="openStudySession('${ts.name}')">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <div style="width:10px;height:10px;border-radius:50%;background:${ts.color}"></div>
+          <div class="tsub-name">${ts.name}</div>
+        </div>
+        <div class="tsub-topics">${total} tópicos • ${done} feitos</div>
+        <div class="progress"><div class="progress-fill pf-gold" style="width:${p}%"></div></div>
+      </div>`;
+    }).join('');
+  } else {
+    todayEl.innerHTML = `<div class="empty-state" style="padding:20px">
+      <div class="empty-icon" style="font-size:28px">🎉</div>
+      <div class="empty-title" style="font-size:13px">Dia livre ou sem cronograma</div>
+    </div>`;
+  }
+
+  // revision alerts
+  const revEl = document.getElementById('dashRevisions');
+  if (pendingRevs.length) {
+    revEl.innerHTML = pendingRevs.slice(0,5).map(r=>{
+      const isOverdue = new Date(r.dueDate)<today;
+      return `<div class="revision-item" onclick="goPage('revision')">
+        <div class="rev-icon">${isOverdue?'⚠️':'⏰'}</div>
+        <div>
+          <div class="rev-name">${r.topicName}</div>
+          <div class="rev-meta">${r.subjectName} • Revisão ${r.stage} de 3</div>
+        </div>
+        <div class="rev-when ${isOverdue?'urgent':''}">${isOverdue?'Atrasada':fmtDate(r.dueDate)}</div>
+      </div>`;
+    }).join('');
+  } else {
+    revEl.innerHTML = `<div class="empty-state" style="padding:20px">
+      <div class="empty-icon" style="font-size:28px">✨</div>
+      <div class="empty-title" style="font-size:13px">Nenhuma revisão urgente</div>
+    </div>`;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  STUDY SESSION MODAL
+// ══════════════════════════════════════════════════════════════
+function openStudySession(preselect='') {
+  const subs = getData('subjects');
+  const sel = document.getElementById('study-subject');
+  sel.innerHTML = '<option value="">Selecione...</option>' + subs.map(s=>`<option value="${s.id}" ${s.name===preselect?'selected':''}>${s.name}</option>`).join('');
+  document.getElementById('studyTopicsList').innerHTML = '';
+  if (preselect) loadStudyTopics();
+  openModal('studySessionModal');
+}
+
+function loadStudyTopics() {
+  const subId = document.getElementById('study-subject').value;
+  const subs  = getData('subjects');
+  const sub   = subs.find(s=>s.id==subId);
+  const list  = document.getElementById('studyTopicsList');
+  if (!sub) { list.innerHTML=''; return; }
+  list.innerHTML = sub.topics.map(t=>`
+    <div class="topic-study-item">
+      <div class="topic-done-check ${t.done?'checked':''}" onclick="toggleTopicInSession(${sub.id},${t.id},this)">
+        ${t.done?'✓':''}
+      </div>
+      <span style="font-size:13px;color:rgba(255,255,255,${t.done?.5:.8})">${t.name}</span>
+      ${t.done?`<span class="badge b-green" style="margin-left:auto;font-size:10px">Feito</span>`:''}
+    </div>
+  `).join('') || '<div style="color:var(--muted);font-size:13px;padding:8px">Sem tópicos cadastrados.</div>';
+}
+
+function toggleTopicInSession(subId, topicId, el) {
+  const subs = getData('subjects');
+  const sub = subs.find(s=>s.id===subId);
+  const t = sub?.topics.find(t=>t.id===topicId);
+  if (!t) return;
+  t.done = !t.done;
+  t.doneAt = t.done?new Date().toISOString():null;
+  if (t.done) createRevisionEntries(sub.name, t.name, topicId, subId);
+  setData('subjects', subs);
+  el.classList.toggle('checked', t.done);
+  el.innerHTML = t.done?'✓':'';
+}
+
+function confirmStudySession() {
+  closeModal('studySessionModal');
+  renderSubjects();
+  updateDashboard();
+  updateNavBadges();
+  toast('Sessão registrada! Revisões agendadas automaticamente. 🧠','success');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════════════════
+function populateSubjectSelects() {
+  const subs = getData('subjects');
+  ['q-subject','q-filter-sub'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const first = id==='q-filter-sub'?'<option value="">Todas as matérias</option>':'<option value="">Selecione a matéria...</option>';
+    el.innerHTML = first + subs.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  });
+}
+
+function updateNavBadges() {
+  const subs = getData('subjects');
+  document.getElementById('nb-subjects').textContent = subs.length;
+  const revs = getData('revisions',[]);
+  const todayEnd = new Date(); todayEnd.setHours(23,59,59,999);
+  const pending = revs.filter(r=>!r.done && new Date(r.dueDate)<=todayEnd).length;
+  const revBadge = document.getElementById('nb-revisions');
+  if (pending>0) { revBadge.style.display=''; revBadge.textContent=pending; }
+  else revBadge.style.display='none';
+}
+
+function fmtDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const dDay  = new Date(d); dDay.setHours(0,0,0,0);
+  const diff  = Math.round((dDay-today)/(1000*60*60*24));
+  if (diff===0) return 'Hoje';
+  if (diff===1) return 'Amanhã';
+  if (diff===-1) return 'Ontem';
+  if (diff<0) return `${Math.abs(diff)} dias atrás`;
+  if (diff<=7) return `Em ${diff} dias`;
+  return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
+}
+
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target===o) o.classList.remove('open'); });
+});
+
+// Enter key on login
+document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
+document.getElementById('loginUser').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
+
+function toast(msg, type='info') {
+  const c = document.getElementById('toastContainer');
+  const icons = { success:'✅', error:'❌', info:'ℹ️' };
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${icons[type]||'💬'}</span><span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity='0';t.style.transform='translateX(20px)';t.style.transition='all .3s ease'; setTimeout(()=>t.remove(),300); }, 3500);
+}
+
+// ── Auto-login if session exists in sessionStorage ──
+(function() {
+  const savedUser = sessionStorage.getItem('sf_session');
+  if (savedUser) {
+    try {
+      const u = JSON.parse(savedUser);
+      const users = getUsers();
+      const found = users.find(x=>x.id===u.id && x.username===u.username);
+      if (found) { CU = found; launchApp(); }
+    } catch {}
+  }
+})();
+
+// Save session on login
+const _origLaunch = launchApp;
+window.launchApp = function() {
+  sessionStorage.setItem('sf_session', JSON.stringify({id:CU.id,username:CU.username}));
+  _origLaunch();
+};
+const _origLogout = doLogout;
+window.doLogout = function() {
+  sessionStorage.removeItem('sf_session');
+  _origLogout();
+};
+</script>
+</body>
+</html>
