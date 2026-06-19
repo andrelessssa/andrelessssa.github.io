@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARSAL · Central de Chamados TI</title>
+<style>
+/* ============================================================
+   TOKENS
+============================================================ */
+:root{
+  --void:      #0A1118;
+  --bg:        #0F1923;
+  --panel:     #162030;
+  --panel2:    #1C2A3E;
+  --border:    #243450;
+  --border-s:  rgba(36,52,80,.45);
+
+  --txt:       #E8F0FA;
+  --txt-mid:   #8BA4C8;
+  --txt-dim:   #4D6488;
+
+  --amber:     #F97316;
+  --amber-dim: rgba(249,115,22,.15);
+  --green:     #22C55E;
+  --green-dim: rgba(34,197,94,.13);
+  --blue:      #38BDF8;
+  --blue-dim:  rgba(56,189,248,.12);
+  --rose:      #FB7185;
+  --rose-dim:  rgba(251,113,133,.13);
+
+  --mono: "JetBrains Mono","Fira Code","Courier New",monospace;
+  --sans: "Inter","Segoe UI",system-ui,sans-serif;
+
+  --r:  12px;
+  --rs: 7px;
+  --ease: cubic-bezier(.22,.61,.36,1);
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--txt-mid);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+::-webkit-scrollbar{ width:8px; background:var(--void); }
+::-webkit-scrollbar-thumb{ background:var(--border); border-radius:8px; }
+
+/* ============================================================
+   TOPBAR
+============================================================ */
+.topbar{
+  background: var(--void);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  height: 60px;
+  position: sticky; top:0; z-index:60;
+}
+.logo{
+  font-family: var(--mono);
+  font-size: .82rem;
+  color: var(--txt);
+  letter-spacing:.06em;
+  display:flex; align-items:center; gap:10px;
+}
+.logo-dot{
+  width:8px; height:8px; border-radius:50%; background:var(--amber);
+  box-shadow: 0 0 0 0 rgba(249,115,22,.5);
+  animation: ping 2.2s infinite;
+}
+@keyframes ping{
+  0%{ box-shadow:0 0 0 0 rgba(249,115,22,.5); }
+  70%{ box-shadow:0 0 0 8px rgba(249,115,22,0); }
+  100%{ box-shadow:0 0 0 0 rgba(249,115,22,0); }
+}
+.topbar-meta{
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: .73rem;
+  color: var(--txt-dim);
+  display:flex; gap:20px; align-items:center;
+}
+#live-count{
+  color: var(--amber);
+  font-weight:700;
+}
+#live-clock{ color: var(--txt-dim); }
+
+/* ============================================================
+   TABS
+============================================================ */
+.tabs{
+  display:flex;
+  gap:0;
+  border-bottom: 1px solid var(--border);
+  background: var(--void);
+  padding: 0 28px;
+}
+.tab-btn{
+  font-family: var(--mono);
+  font-size: .78rem;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color: var(--txt-dim);
+  background: none; border:none;
+  padding: 14px 20px;
+  cursor:pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom:-1px;
+  transition: color .2s, border-color .2s;
+  display:flex; align-items:center; gap:8px;
+}
+.tab-btn:hover{ color: var(--txt); }
+.tab-btn.active{
+  color: var(--amber);
+  border-bottom-color: var(--amber);
+}
+.tab-badge{
+  background: var(--amber-dim);
+  color: var(--amber);
+  border-radius:99px;
+  padding:2px 7px;
+  font-size:.68rem;
+  font-family: var(--mono);
+  min-width:20px;
+  text-align:center;
+}
+
+/* ============================================================
+   VIEWS
+============================================================ */
+.view{ display:none; padding: 36px 28px 80px; max-width:1100px; margin:0 auto; }
+.view.active{ display:block; }
+
+/* ============================================================
+   VIEW 1 – ABRIR CHAMADO
+============================================================ */
+.form-hero{
+  text-align:center;
+  padding: 0 0 44px;
+}
+.form-hero .label{
+  font-family:var(--mono);
+  font-size:.78rem;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color: var(--amber);
+  margin-bottom:12px;
+}
+.form-hero h1{
+  font-size: clamp(1.8rem,4vw,2.6rem);
+  font-weight:700;
+  color: var(--txt);
+  line-height:1.1;
+  margin-bottom:10px;
+}
+.form-hero p{ color: var(--txt-dim); font-size:.96rem; }
+
+.card{
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 32px;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+@media(max-width:680px){ .form-grid{ grid-template-columns:1fr; } }
+.form-full{ grid-column:1/-1; }
+
+.field{ display:flex; flex-direction:column; gap:8px; }
+.field label{
+  font-family:var(--mono);
+  font-size:.73rem;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color: var(--txt-dim);
+}
+.field input,
+.field select,
+.field textarea{
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: var(--rs);
+  color: var(--txt);
+  font-family: var(--sans);
+  font-size:.94rem;
+  padding: 12px 14px;
+  transition: border-color .2s;
+  outline:none;
+  width:100%;
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus{
+  border-color: var(--amber);
+  box-shadow: 0 0 0 3px var(--amber-dim);
+}
+.field select option{ background: var(--panel2); }
+.field textarea{ resize:vertical; min-height:100px; }
+
+/* priority pills */
+.pill-group{ display:flex; gap:8px; flex-wrap:wrap; }
+.pill{
+  font-family:var(--mono);
+  font-size:.75rem;
+  padding:8px 16px;
+  border-radius:99px;
+  border: 1px solid var(--border);
+  color: var(--txt-mid);
+  background: var(--panel2);
+  cursor:pointer;
+  transition: all .2s;
+}
+.pill:hover{ border-color: var(--txt-mid); color: var(--txt); }
+.pill.sel-baixa{ border-color:var(--green); color:var(--green); background:var(--green-dim); }
+.pill.sel-media{ border-color:var(--amber); color:var(--amber); background:var(--amber-dim); }
+.pill.sel-alta{  border-color:var(--rose);  color:var(--rose);  background:var(--rose-dim); }
+
+.btn-submit{
+  width:100%; padding:15px;
+  background: var(--amber);
+  color: #0A1118;
+  font-family: var(--mono);
+  font-size:.9rem;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  border:none; border-radius:var(--r);
+  cursor:pointer;
+  margin-top:24px;
+  transition: background .2s, transform .15s;
+}
+.btn-submit:hover{ background:#FB923C; transform:translateY(-1px); }
+.btn-submit:active{ transform:translateY(0); }
+
+/* success flash */
+.flash{
+  display:none;
+  background: var(--green-dim);
+  border:1px solid var(--green);
+  border-radius:var(--r);
+  padding:20px 24px;
+  margin-top:20px;
+  font-size:.94rem;
+  color: var(--green);
+  text-align:center;
+}
+.flash strong{ font-family:var(--mono); display:block; font-size:1.1rem; margin-bottom:4px; }
+
+/* ============================================================
+   VIEW 2 – PAINEL TÉCNICO
+============================================================ */
+.painel-header{
+  display:flex; align-items:center; gap:16px; margin-bottom:28px; flex-wrap:wrap;
+}
+.painel-header h2{ font-size:1.4rem; font-weight:600; color:var(--txt); flex:1; min-width:180px; }
+.filter-row{ display:flex; gap:8px; flex-wrap:wrap; }
+.filter-btn{
+  font-family:var(--mono); font-size:.72rem;
+  padding:7px 14px; border-radius:99px;
+  border:1px solid var(--border); background:var(--panel2);
+  color:var(--txt-dim); cursor:pointer;
+  transition:all .2s;
+}
+.filter-btn:hover{ color:var(--txt); border-color:var(--txt-dim); }
+.filter-btn.active{ background:var(--amber-dim); border-color:var(--amber); color:var(--amber); }
+
+.chamados-list{ display:flex; flex-direction:column; gap:12px; }
+
+.chamado-card{
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--border);
+  border-radius: var(--r);
+  padding:18px 22px;
+  display:grid;
+  grid-template-columns: 1fr auto;
+  gap:12px 20px;
+  align-items:start;
+  transition: border-color .2s, background .2s;
+  animation: slideIn .35s var(--ease);
+}
+@keyframes slideIn{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:translateY(0); } }
+.chamado-card.prio-baixa{ border-left-color: var(--green); }
+.chamado-card.prio-media{ border-left-color: var(--amber); }
+.chamado-card.prio-alta{  border-left-color: var(--rose); }
+.chamado-card.status-andamento{ background: var(--panel2); border-color: var(--blue); border-left-color: var(--blue); }
+.chamado-card.status-fechado{ opacity:.55; border-left-color: var(--border); }
+
+.card-main h3{
+  font-size:1rem; font-weight:600; color:var(--txt); margin-bottom:6px;
+}
+.card-meta{
+  display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:8px;
+}
+.badge{
+  font-family:var(--mono); font-size:.68rem;
+  padding:3px 9px; border-radius:99px;
+  border:1px solid;
+}
+.badge-setor{ border-color:var(--border); color:var(--txt-mid); }
+.badge-tipo{ border-color:var(--blue-dim); color:var(--blue); background:var(--blue-dim); }
+.badge-equip{ border-color:var(--border); color:var(--txt-dim); }
+.badge-prio-baixa{ border-color:var(--green); color:var(--green); background:var(--green-dim); }
+.badge-prio-media{ border-color:var(--amber); color:var(--amber); background:var(--amber-dim); }
+.badge-prio-alta{  border-color:var(--rose);  color:var(--rose);  background:var(--rose-dim); }
+.badge-aberto{     border-color:var(--amber);  color:var(--amber); }
+.badge-andamento{  border-color:var(--blue);   color:var(--blue); }
+.badge-fechado{    border-color:var(--border);  color:var(--txt-dim); }
+
+.card-desc{ font-size:.88rem; color:var(--txt-dim); line-height:1.55; }
+.card-footer{ margin-top:10px; display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
+.card-ts{ font-family:var(--mono); font-size:.7rem; color:var(--txt-dim); }
+.card-tecnico{ font-family:var(--mono); font-size:.7rem; color:var(--blue); }
+
+.card-actions{ display:flex; flex-direction:column; gap:8px; align-items:flex-end; }
+.act-btn{
+  font-family:var(--mono); font-size:.72rem;
+  padding:8px 14px; border-radius:var(--rs);
+  border:1px solid; cursor:pointer;
+  white-space:nowrap; transition:all .18s;
+}
+.act-btn.assumir{
+  border-color:var(--blue); color:var(--blue); background:var(--blue-dim);
+}
+.act-btn.assumir:hover{ background:#1A3A5C; }
+.act-btn.fechar{
+  border-color:var(--green); color:var(--green); background:var(--green-dim);
+}
+.act-btn.fechar:hover{ background:#0D2A1A; }
+.act-btn.reabrir{
+  border-color:var(--txt-dim); color:var(--txt-dim); background:transparent;
+}
+
+#empty-state{
+  text-align:center; padding:60px 0;
+  font-family:var(--mono); font-size:.88rem; color:var(--txt-dim);
+  display:none;
+}
+#empty-state span{ font-size:2.4rem; display:block; margin-bottom:14px; }
+
+/* tecnico input no modal */
+.modal-overlay{
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.65); z-index:200;
+  align-items:center; justify-content:center;
+}
+.modal-overlay.open{ display:flex; }
+.modal{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:32px;
+  max-width:460px; width:90%;
+  box-shadow:0 30px 80px rgba(0,0,0,.5);
+}
+.modal h3{ color:var(--txt); font-size:1.1rem; margin-bottom:18px; }
+.modal-actions{ display:flex; gap:10px; margin-top:20px; }
+.modal-actions .btn-cancel{
+  flex:1; padding:12px;
+  background:none; border:1px solid var(--border);
+  border-radius:var(--rs); color:var(--txt-mid);
+  font-family:var(--mono); font-size:.8rem; cursor:pointer;
+  transition:border-color .2s;
+}
+.modal-actions .btn-cancel:hover{ border-color:var(--txt-mid); }
+.modal-actions .btn-confirm{
+  flex:2; padding:12px;
+  background:var(--blue-dim); border:1px solid var(--blue);
+  border-radius:var(--rs); color:var(--blue);
+  font-family:var(--mono); font-size:.8rem; font-weight:700; cursor:pointer;
+  transition:background .2s;
+}
+.modal-actions .btn-confirm:hover{ background:#1A3A5C; }
+
+/* ============================================================
+   VIEW 3 – RELATÓRIO
+============================================================ */
+.report-header{
+  display:flex; align-items:center; gap:16px; margin-bottom:28px; flex-wrap:wrap;
+}
+.report-header h2{ font-size:1.4rem; font-weight:600; color:var(--txt); flex:1; }
+.month-select{
+  font-family:var(--mono); font-size:.8rem;
+  background:var(--panel2); border:1px solid var(--border);
+  border-radius:var(--rs); color:var(--txt); padding:9px 14px;
+  cursor:pointer; outline:none;
+}
+.month-select:focus{ border-color:var(--amber); }
+
+.stats-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+  gap:14px; margin-bottom:30px;
+}
+.stat-card{
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--r); padding:22px 20px;
+}
+.stat-card .stat-label{
+  font-family:var(--mono); font-size:.7rem;
+  letter-spacing:.07em; text-transform:uppercase;
+  color:var(--txt-dim); margin-bottom:8px;
+}
+.stat-card .stat-val{
+  font-size:2.2rem; font-weight:700; color:var(--txt); line-height:1;
+  margin-bottom:4px;
+}
+.stat-card .stat-sub{ font-size:.8rem; color:var(--txt-dim); }
+
+.charts-grid{
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:16px; margin-bottom:20px;
+}
+@media(max-width:720px){ .charts-grid{ grid-template-columns:1fr; } }
+
+.chart-card{
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--r); padding:24px;
+}
+.chart-card h3{
+  font-family:var(--mono); font-size:.75rem;
+  text-transform:uppercase; letter-spacing:.07em;
+  color:var(--txt-dim); margin-bottom:20px;
+}
+
+/* bar charts */
+.bar-row{ display:flex; flex-direction:column; gap:10px; }
+.bar-item{ display:flex; flex-direction:column; gap:5px; }
+.bar-label-row{
+  display:flex; justify-content:space-between;
+  font-size:.8rem; color:var(--txt-mid);
+}
+.bar-label-row .val{ font-family:var(--mono); color:var(--txt); }
+.bar-track{
+  height:8px; background:var(--panel2); border-radius:99px; overflow:hidden;
+}
+.bar-fill{
+  height:100%; border-radius:99px;
+  background: var(--amber);
+  transition: width .6s var(--ease);
+}
+.bar-fill.green{ background: var(--green); }
+.bar-fill.blue{ background: var(--blue); }
+.bar-fill.rose{ background: var(--rose); }
+
+/* tecnico table */
+.tec-table{ width:100%; border-collapse:collapse; }
+.tec-table th{
+  font-family:var(--mono); font-size:.68rem;
+  letter-spacing:.07em; text-transform:uppercase;
+  color:var(--txt-dim); text-align:left;
+  padding:8px 10px; border-bottom:1px solid var(--border);
+}
+.tec-table td{
+  font-size:.88rem; color:var(--txt-mid);
+  padding:10px 10px; border-bottom:1px solid var(--border-s);
+}
+.tec-table tr:last-child td{ border-bottom:none; }
+.tec-table td:last-child,
+.tec-table th:last-child{ text-align:right; }
+.tec-num{ font-family:var(--mono); color:var(--txt); font-weight:600; }
+
+/* ============================================================
+   TOAST
+============================================================ */
+.toast-wrap{
+  position:fixed; bottom:24px; right:24px; z-index:300;
+  display:flex; flex-direction:column; gap:10px; align-items:flex-end;
+}
+.toast{
+  background:var(--panel2); border:1px solid var(--green);
+  border-radius:var(--r); padding:14px 18px;
+  font-size:.88rem; color:var(--txt);
+  max-width:320px;
+  box-shadow:0 8px 32px rgba(0,0,0,.4);
+  display:flex; align-items:center; gap:10px;
+  animation: toastIn .35s var(--ease);
+}
+.toast.warn{ border-color:var(--rose); }
+@keyframes toastIn{
+  from{ opacity:0; transform:translateX(20px); }
+  to{   opacity:1; transform:translateX(0); }
+}
+.toast-icon{ font-size:1.1rem; }
+
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     TOPBAR
+============================================================ -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-dot"></div>
+    ARSAL · Chamados TI
+  </div>
+  <div class="topbar-meta">
+    <span><span id="live-count">0</span> chamados abertos</span>
+    <span id="live-clock">--:--:--</span>
+  </div>
+</div>
+
+<!-- ============================================================
+     TABS
+============================================================ -->
+<div class="tabs">
+  <button class="tab-btn active" data-tab="abrir">
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x=".5" y=".5" width="12" height="12" rx="2.5" stroke="currentColor"/><path d="M6.5 4v5M4 6.5h5" stroke="currentColor" stroke-linecap="round"/></svg>
+    Abrir Chamado
+  </button>
+  <button class="tab-btn" data-tab="painel">
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x=".5" y=".5" width="12" height="12" rx="2.5" stroke="currentColor"/><path d="M2 4.5h9M2 8.5h6" stroke="currentColor" stroke-linecap="round"/></svg>
+    Painel Técnico
+    <span class="tab-badge" id="badge-abertos">0</span>
+  </button>
+  <button class="tab-btn" data-tab="relatorio">
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x=".5" y=".5" width="12" height="12" rx="2.5" stroke="currentColor"/><path d="M3 9.5l2.5-3L8 8l2.5-4" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Relatório Mensal
+  </button>
+</div>
+
+<!-- ============================================================
+     VIEW 1 – ABRIR CHAMADO
+============================================================ -->
+<div class="view active" id="view-abrir">
+  <div class="form-hero">
+    <div class="label">Central de Suporte</div>
+    <h1>Precisa de ajuda com TI?</h1>
+    <p>Preencha abaixo. A equipe técnica recebe o chamado na hora.</p>
+  </div>
+
+  <div class="card">
+    <div class="form-grid">
+      <div class="field">
+        <label>Seu nome</label>
+        <input id="f-nome" type="text" placeholder="Ex: Maria Silva">
+      </div>
+      <div class="field">
+        <label>Setor / Departamento</label>
+        <input id="f-setor" type="text" placeholder="Ex: Financeiro, Jurídico…">
+      </div>
+      <div class="field">
+        <label>Tipo de equipamento</label>
+        <select id="f-equip">
+          <option value="">Selecione…</option>
+          <option>Computador / Desktop</option>
+          <option>Notebook</option>
+          <option>Impressora</option>
+          <option>Monitor</option>
+          <option>Telefone / Ramal</option>
+          <option>Roteador / Switch / Rede</option>
+          <option>Projetor</option>
+          <option>Scanner</option>
+          <option>Sistema / Software</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Tipo de problema</label>
+        <select id="f-tipo">
+          <option value="">Selecione…</option>
+          <option>Não liga / sem energia</option>
+          <option>Lentidão</option>
+          <option>Sem acesso à internet</option>
+          <option>Sem acesso à rede interna</option>
+          <option>Erro em sistema / software</option>
+          <option>Vírus / Segurança</option>
+          <option>Impressão com problemas</option>
+          <option>Tela / imagem com defeito</option>
+          <option>Perifério com defeito (teclado, mouse…)</option>
+          <option>Instalação / configuração</option>
+          <option>Solicitação de acesso</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <div class="field form-full">
+        <label>Prioridade</label>
+        <div class="pill-group" id="prio-group">
+          <button class="pill" data-prio="baixa">🟢 Baixa — pode esperar</button>
+          <button class="pill" data-prio="media">🟡 Média — atender em breve</button>
+          <button class="pill" data-prio="alta">🔴 Alta — parou de trabalhar</button>
+        </div>
+      </div>
+      <div class="field form-full">
+        <label>Descreva o problema</label>
+        <textarea id="f-desc" placeholder="Explique o que aconteceu, quando começou e qualquer detalhe que ajude o técnico…"></textarea>
+      </div>
+    </div>
+    <button class="btn-submit" id="btn-enviar">Enviar Chamado</button>
+    <div class="flash" id="form-flash">
+      <strong>✓ Chamado registrado!</strong>
+      A equipe de TI recebeu o seu chamado e vai te atender em breve.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     VIEW 2 – PAINEL TÉCNICO
+============================================================ -->
+<div class="view" id="view-painel">
+  <div class="painel-header">
+    <h2>Fila de Chamados</h2>
+    <div class="filter-row">
+      <button class="filter-btn active" data-filter="todos">Todos</button>
+      <button class="filter-btn" data-filter="aberto">Abertos</button>
+      <button class="filter-btn" data-filter="andamento">Em andamento</button>
+      <button class="filter-btn" data-filter="fechado">Fechados</button>
+      <button class="filter-btn" data-filter="alta">🔴 Alta prioridade</button>
+    </div>
+  </div>
+
+  <div id="empty-state">
+    <span>📭</span>
+    Nenhum chamado no momento.<br>Assim que alguém abrir, aparece aqui em tempo real.
+  </div>
+  <div class="chamados-list" id="chamados-list"></div>
+</div>
+
+<!-- ============================================================
+     VIEW 3 – RELATÓRIO
+============================================================ -->
+<div class="view" id="view-relatorio">
+  <div class="report-header">
+    <h2>Relatório Mensal</h2>
+    <select class="month-select" id="month-sel"></select>
+  </div>
+
+  <div class="stats-grid" id="stats-grid"></div>
+
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>Chamados por tipo de problema</h3>
+      <div class="bar-row" id="chart-tipo"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Chamados por setor</h3>
+      <div class="bar-row" id="chart-setor"></div>
+    </div>
+    <div class="chart-card" style="grid-column:1/-1">
+      <h3>Produção por técnico</h3>
+      <table class="tec-table" id="tec-table">
+        <thead>
+          <tr>
+            <th>Técnico</th>
+            <th>Assumidos</th>
+            <th>Fechados</th>
+            <th>Em andamento</th>
+            <th style="text-align:right">% Fechamento</th>
+          </tr>
+        </thead>
+        <tbody id="tec-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL – ASSUMIR CHAMADO
+============================================================ -->
+<div class="modal-overlay" id="modal-assumir">
+  <div class="modal">
+    <h3>Assumir chamado</h3>
+    <div class="field">
+      <label>Seu nome (técnico)</label>
+      <input id="m-tecnico" type="text" placeholder="Ex: João Oliveira">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="modal-cancel">Cancelar</button>
+      <button class="btn-confirm" id="modal-confirm">Assumir →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+/* ============================================================
+   STORAGE & STATE
+============================================================ */
+const STORAGE_KEY = 'arsal_chamados_v2';
+
+function loadData(){
+  try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch{ return []; }
+}
+function saveData(arr){ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }
+
+let chamados = loadData();
+let filterActive = 'todos';
+let pendingAssumir = null; // id do chamado aguardando modal
+
+/* ============================================================
+   HELPERS
+============================================================ */
+function uid(){
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+}
+function ts(d){ return new Date(d).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+function monthKey(d){ const D=new Date(d); return `${D.getFullYear()}-${String(D.getMonth()+1).padStart(2,'0')}`; }
+function monthLabel(k){
+  const [y,m]=k.split('-');
+  const names=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  return `${names[+m-1]} ${y}`;
+}
+function toast(msg, warn=false){
+  const w=document.getElementById('toast-wrap');
+  const el=document.createElement('div');
+  el.className='toast'+(warn?' warn':'');
+  el.innerHTML=`<span class="toast-icon">${warn?'⚠':'✓'}</span>${msg}`;
+  w.appendChild(el);
+  setTimeout(()=>el.remove(), 4000);
+}
+
+/* ============================================================
+   PRIORIDADE PILLS
+============================================================ */
+let selectedPrio = 'media';
+document.querySelectorAll('#prio-group .pill').forEach(p=>{
+  p.addEventListener('click',()=>{
+    document.querySelectorAll('#prio-group .pill').forEach(x=>{
+      x.className='pill';
+    });
+    const v=p.dataset.prio;
+    p.classList.add('sel-'+v);
+    selectedPrio=v;
+  });
+});
+// default select media
+document.querySelector('[data-prio="media"]').click();
+
+/* ============================================================
+   ABRIR CHAMADO
+============================================================ */
+document.getElementById('btn-enviar').addEventListener('click',()=>{
+  const nome=document.getElementById('f-nome').value.trim();
+  const setor=document.getElementById('f-setor').value.trim();
+  const equip=document.getElementById('f-equip').value;
+  const tipo=document.getElementById('f-tipo').value;
+  const desc=document.getElementById('f-desc').value.trim();
+
+  if(!nome||!setor||!equip||!tipo){
+    toast('Preencha os campos obrigatórios: nome, setor, equipamento e tipo de problema.',true);
+    return;
+  }
+
+  const chamado={
+    id: uid(),
+    nome, setor, equip, tipo, desc,
+    prioridade: selectedPrio,
+    status: 'aberto',
+    tecnico: '',
+    criadoEm: Date.now(),
+    atualizadoEm: Date.now(),
+    mes: monthKey(Date.now()),
+  };
+
+  chamados.unshift(chamado);
+  saveData(chamados);
+  updateBadge();
+
+  // reset form
+  ['f-nome','f-setor','f-desc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-equip').value='';
+  document.getElementById('f-tipo').value='';
+  document.querySelector('[data-prio="media"]').click();
+
+  const flash=document.getElementById('form-flash');
+  flash.style.display='block';
+  setTimeout(()=>flash.style.display='none', 4000);
+
+  toast('Chamado enviado com sucesso!');
+});
+
+/* ============================================================
+   TABS
+============================================================ */
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('view-'+btn.dataset.tab).classList.add('active');
+    if(btn.dataset.tab==='painel') renderPainel();
+    if(btn.dataset.tab==='relatorio') renderRelatorio();
+  });
+});
+
+/* ============================================================
+   PAINEL TÉCNICO
+============================================================ */
+document.querySelectorAll('.filter-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-btn').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    filterActive=b.dataset.filter;
+    renderPainel();
+  });
+});
+
+function filteredChamados(){
+  if(filterActive==='todos')     return chamados;
+  if(filterActive==='alta')      return chamados.filter(c=>c.prioridade==='alta' && c.status!=='fechado');
+  return chamados.filter(c=>c.status===filterActive);
+}
+
+function renderPainel(){
+  chamados=loadData();
+  const list=document.getElementById('chamados-list');
+  const empty=document.getElementById('empty-state');
+  const data=filteredChamados();
+
+  if(data.length===0){
+    list.innerHTML=''; empty.style.display='block'; return;
+  }
+  empty.style.display='none';
+  list.innerHTML='';
+
+  data.forEach(c=>{
+    const div=document.createElement('div');
+    div.className=`chamado-card prio-${c.prioridade} status-${c.status}`;
+    div.innerHTML=`
+      <div class="card-main">
+        <h3>${esc(c.nome)} — ${esc(c.setor)}</h3>
+        <div class="card-meta">
+          <span class="badge badge-setor">${esc(c.setor)}</span>
+          <span class="badge badge-tipo">${esc(c.tipo)}</span>
+          <span class="badge badge-equip">${esc(c.equip)}</span>
+          <span class="badge badge-prio-${c.prioridade}">${prioLabel(c.prioridade)}</span>
+          <span class="badge badge-${c.status}">${statusLabel(c.status)}</span>
+        </div>
+        ${c.desc ? `<div class="card-desc">${esc(c.desc)}</div>` : ''}
+        <div class="card-footer">
+          <span class="card-ts">Aberto em ${ts(c.criadoEm)}</span>
+          ${c.tecnico ? `<span class="card-tecnico">Técnico: ${esc(c.tecnico)}</span>` : ''}
+        </div>
+      </div>
+      <div class="card-actions">
+        ${actionsFor(c)}
+      </div>
+    `;
+
+    // bind action buttons
+    const aAssumir=div.querySelector('.assumir');
+    const aFechar=div.querySelector('.fechar');
+    const aReabrir=div.querySelector('.reabrir');
+    if(aAssumir) aAssumir.addEventListener('click',()=>openModalAssumir(c.id));
+    if(aFechar)  aFechar.addEventListener('click',()=>fecharChamado(c.id));
+    if(aReabrir) aReabrir.addEventListener('click',()=>reabrirChamado(c.id));
+
+    list.appendChild(div);
+  });
+
+  updateBadge();
+}
+
+function actionsFor(c){
+  if(c.status==='aberto')     return `<button class="act-btn assumir">Assumir</button>`;
+  if(c.status==='andamento')  return `<button class="act-btn fechar">Marcar como resolvido</button><button class="act-btn reabrir">Reabrir</button>`;
+  if(c.status==='fechado')    return `<button class="act-btn reabrir">Reabrir</button>`;
+  return '';
+}
+
+function openModalAssumir(id){
+  pendingAssumir=id;
+  document.getElementById('m-tecnico').value='';
+  document.getElementById('modal-assumir').classList.add('open');
+  document.getElementById('m-tecnico').focus();
+}
+document.getElementById('modal-cancel').addEventListener('click',()=>{
+  document.getElementById('modal-assumir').classList.remove('open');
+  pendingAssumir=null;
+});
+document.getElementById('modal-confirm').addEventListener('click',()=>{
+  const tec=document.getElementById('m-tecnico').value.trim();
+  if(!tec){ toast('Digite o nome do técnico.',true); return; }
+  const idx=chamados.findIndex(c=>c.id===pendingAssumir);
+  if(idx>-1){
+    chamados[idx].status='andamento';
+    chamados[idx].tecnico=tec;
+    chamados[idx].atualizadoEm=Date.now();
+    saveData(chamados);
+    renderPainel();
+    toast(`Chamado assumido por ${tec}.`);
+  }
+  document.getElementById('modal-assumir').classList.remove('open');
+  pendingAssumir=null;
+});
+// close modal on overlay click
+document.getElementById('modal-assumir').addEventListener('click',function(e){
+  if(e.target===this){ this.classList.remove('open'); pendingAssumir=null; }
+});
+
+function fecharChamado(id){
+  const idx=chamados.findIndex(c=>c.id===id);
+  if(idx>-1){
+    chamados[idx].status='fechado';
+    chamados[idx].atualizadoEm=Date.now();
+    saveData(chamados);
+    renderPainel();
+    toast('Chamado marcado como resolvido ✓');
+  }
+}
+function reabrirChamado(id){
+  const idx=chamados.findIndex(c=>c.id===id);
+  if(idx>-1){
+    chamados[idx].status='aberto';
+    chamados[idx].tecnico='';
+    chamados[idx].atualizadoEm=Date.now();
+    saveData(chamados);
+    renderPainel();
+    toast('Chamado reaberto.',true);
+  }
+}
+
+function prioLabel(p){ return p==='alta'?'🔴 Alta':p==='media'?'🟡 Média':'🟢 Baixa'; }
+function statusLabel(s){ return s==='aberto'?'Aberto':s==='andamento'?'Em andamento':'Fechado'; }
+function esc(s){ return String(s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function updateBadge(){
+  chamados=loadData();
+  const abertos=chamados.filter(c=>c.status==='aberto').length;
+  document.getElementById('badge-abertos').textContent=abertos;
+  document.getElementById('live-count').textContent=abertos;
+}
+
+/* ============================================================
+   RELATÓRIO
+============================================================ */
+function renderRelatorio(){
+  chamados=loadData();
+  const sel=document.getElementById('month-sel');
+
+  // build months list
+  const meses=[...new Set(chamados.map(c=>c.mes))].sort().reverse();
+  if(meses.length===0) meses.push(monthKey(Date.now()));
+  sel.innerHTML=meses.map(m=>`<option value="${m}">${monthLabel(m)}</option>`).join('');
+
+  sel.onchange=()=>buildReport(sel.value);
+  buildReport(sel.value||meses[0]);
+}
+
+function buildReport(mes){
+  chamados=loadData();
+  const data=chamados.filter(c=>c.mes===mes);
+  const total=data.length;
+  const fechados=data.filter(c=>c.status==='fechado').length;
+  const emAnd=data.filter(c=>c.status==='andamento').length;
+  const abertos=data.filter(c=>c.status==='aberto').length;
+  const pAlta=data.filter(c=>c.prioridade==='alta').length;
+
+  // stats
+  document.getElementById('stats-grid').innerHTML=`
+    <div class="stat-card"><div class="stat-label">Total de chamados</div><div class="stat-val">${total}</div><div class="stat-sub">no mês</div></div>
+    <div class="stat-card"><div class="stat-label">Resolvidos</div><div class="stat-val" style="color:var(--green)">${fechados}</div><div class="stat-sub">${total?Math.round(fechados/total*100):0}% do total</div></div>
+    <div class="stat-card"><div class="stat-label">Em andamento</div><div class="stat-val" style="color:var(--blue)">${emAnd}</div><div class="stat-sub">em atendimento</div></div>
+    <div class="stat-card"><div class="stat-label">Aguardando</div><div class="stat-val" style="color:var(--amber)">${abertos}</div><div class="stat-sub">na fila</div></div>
+    <div class="stat-card"><div class="stat-label">Alta prioridade</div><div class="stat-val" style="color:var(--rose)">${pAlta}</div><div class="stat-sub">${total?Math.round(pAlta/total*100):0}% do total</div></div>
+  `;
+
+  // chart tipo
+  const byTipo={};
+  data.forEach(c=>{ byTipo[c.tipo]=(byTipo[c.tipo]||0)+1; });
+  renderBarChart('chart-tipo', byTipo, total, ['amber','blue','green','rose']);
+
+  // chart setor
+  const bySetor={};
+  data.forEach(c=>{ bySetor[c.setor]=(bySetor[c.setor]||0)+1; });
+  renderBarChart('chart-setor', bySetor, total, ['blue','green','amber','rose']);
+
+  // tabela técnicos
+  const tecMap={};
+  data.forEach(c=>{
+    if(!c.tecnico) return;
+    if(!tecMap[c.tecnico]) tecMap[c.tecnico]={assumidos:0,fechados:0,andamento:0};
+    tecMap[c.tecnico].assumidos++;
+    if(c.status==='fechado') tecMap[c.tecnico].fechados++;
+    if(c.status==='andamento') tecMap[c.tecnico].andamento++;
+  });
+
+  const tbody=document.getElementById('tec-tbody');
+  const tecs=Object.entries(tecMap).sort((a,b)=>b[1].fechados-a[1].fechados);
+  if(tecs.length===0){
+    tbody.innerHTML=`<tr><td colspan="5" style="text-align:center;color:var(--txt-dim);padding:20px">Nenhum chamado atendido neste mês ainda.</td></tr>`;
+  } else {
+    tbody.innerHTML=tecs.map(([tec,v])=>`
+      <tr>
+        <td>${esc(tec)}</td>
+        <td class="tec-num">${v.assumidos}</td>
+        <td class="tec-num" style="color:var(--green)">${v.fechados}</td>
+        <td class="tec-num" style="color:var(--blue)">${v.andamento}</td>
+        <td class="tec-num">${v.assumidos?Math.round(v.fechados/v.assumidos*100):0}%</td>
+      </tr>
+    `).join('');
+  }
+}
+
+const COLORS=['amber','blue','green','rose'];
+function renderBarChart(elId, map, total, colors){
+  const el=document.getElementById(elId);
+  const sorted=Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  if(sorted.length===0){ el.innerHTML='<div style="color:var(--txt-dim);font-size:.85rem">Sem dados.</div>'; return; }
+  const max=sorted[0][1];
+  el.innerHTML=sorted.map(([label,val],i)=>`
+    <div class="bar-item">
+      <div class="bar-label-row">
+        <span>${esc(label)}</span>
+        <span class="val">${val} <span style="color:var(--txt-dim)">(${total?Math.round(val/total*100):0}%)</span></span>
+      </div>
+      <div class="bar-track"><div class="bar-fill ${colors[i%colors.length]}" style="width:${Math.round(val/max*100)}%"></div></div>
+    </div>
+  `).join('');
+}
+
+/* ============================================================
+   RELÓGIO
+============================================================ */
+function updateClock(){
+  document.getElementById('live-clock').textContent=
+    new Date().toLocaleTimeString('pt-BR');
+}
+updateClock(); setInterval(updateClock,1000);
+
+/* ============================================================
+   POLLING ao vivo (simula WebSocket)
+   – a cada 5s recarrega dados do storage pra
+     detectar atualizações feitas em outra aba
+============================================================ */
+setInterval(()=>{
+  chamados=loadData();
+  updateBadge();
+  const painelActive=document.getElementById('view-painel').classList.contains('active');
+  if(painelActive) renderPainel();
+},5000);
+
+/* ============================================================
+   INIT
+============================================================ */
+updateBadge();
+
+/* seed com dados demo se não houver nada ainda */
+if(chamados.length===0){
+  const demo=[
+    { id:uid(), nome:'Carla Mendes', setor:'Financeiro', equip:'Computador / Desktop', tipo:'Lentidão', desc:'O computador está muito lento desde ontem, demora 10 minutos pra abrir o Excel.', prioridade:'media', status:'aberto', tecnico:'', criadoEm:Date.now()-3600000, atualizadoEm:Date.now()-3600000, mes:monthKey(Date.now()) },
+    { id:uid(), nome:'Roberto Lima', setor:'Jurídico', equip:'Impressora', tipo:'Impressão com problemas', desc:'A impressora não imprime, só aparece "Offline" no computador.', prioridade:'alta', status:'andamento', tecnico:'João Oliveira', criadoEm:Date.now()-7200000, atualizadoEm:Date.now()-1800000, mes:monthKey(Date.now()) },
+    { id:uid(), nome:'Ana Paula', setor:'RH', equip:'Sistema / Software', tipo:'Erro em sistema / software', desc:'O sistema de ponto eletrônico está dando erro ao tentar registrar.', prioridade:'alta', status:'aberto', tecnico:'', criadoEm:Date.now()-900000, atualizadoEm:Date.now()-900000, mes:monthKey(Date.now()) },
+    { id:uid(), nome:'Fábio Costa', setor:'Diretoria', equip:'Notebook', tipo:'Sem acesso à internet', desc:'Desde de manhã o notebook não conecta ao Wi-Fi.', prioridade:'media', status:'fechado', tecnico:'André Lessa', criadoEm:Date.now()-86400000, atualizadoEm:Date.now()-43200000, mes:monthKey(Date.now()) },
+  ];
+  chamados=demo; saveData(chamados);
+  updateBadge();
+}
+</script>
+</body>
+</html>
