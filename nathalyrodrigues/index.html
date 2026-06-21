@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>Nathaly · Treino de Emagrecimento</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap');
+
+/* ============================================================
+   TOKENS
+============================================================ */
+:root{
+  --void:    #150E16;
+  --panel:   #1F1620;
+  --panel2:  #2A1E2C;
+  --border:  #3D2C40;
+  --border-s:rgba(61,44,64,.5);
+
+  --txt:     #FBF3F8;
+  --txt-mid: #B89AB4;
+  --txt-dim: #6E5870;
+
+  --coral:    #FF4D7E;
+  --coral-dim:rgba(255,77,126,.14);
+  --coral-glow: rgba(255,77,126,.4);
+
+  --teal:    #2DD4BF;
+  --teal-dim:rgba(45,212,191,.16);
+  --teal-glow: rgba(45,212,191,.4);
+
+  --done:    #A3E635;
+  --done-dim:rgba(163,230,53,.14);
+
+  --sun:     #FFC857;
+
+  --f-display: 'Poppins', sans-serif;
+  --f-body:    'Inter', sans-serif;
+  --f-mono:    'JetBrains Mono', monospace;
+
+  --r: 18px;
+  --rs: 12px;
+  --ease: cubic-bezier(.22,.61,.36,1);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html{ scroll-behavior:smooth; }
+body{
+  background: var(--void);
+  background-image: radial-gradient(circle at 80% 0%, rgba(255,77,126,.07), transparent 45%),
+                     radial-gradient(circle at 0% 60%, rgba(45,212,191,.05), transparent 50%);
+  color: var(--txt-mid);
+  font-family: var(--f-body);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: calc(24px + var(--safe-b));
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.01ms !important; transition-duration:.01ms !important; }
+}
+
+::-webkit-scrollbar{ width:6px; }
+::-webkit-scrollbar-thumb{ background:var(--border); border-radius:6px; }
+
+.shell{ max-width: 640px; margin:0 auto; padding: 0 18px; }
+
+/* ============================================================
+   HEADER
+============================================================ */
+.app-header{
+  padding: calc(20px + var(--safe-t)) 18px 18px;
+  display:flex; align-items:center; gap:14px;
+}
+.avatar-ring{
+  width:46px; height:46px; border-radius:16px;
+  background: linear-gradient(135deg, var(--coral), var(--sun));
+  display:flex; align-items:center; justify-content:center;
+  font-family: var(--f-display); font-weight:800; color:var(--void);
+  font-size:1.1rem; flex-shrink:0;
+}
+.header-text h1{
+  font-family: var(--f-display); font-size:1.05rem; color:var(--txt); font-weight:700;
+}
+.header-text p{ font-size:.78rem; color:var(--txt-dim); margin-top:1px; }
+
+.streak-pill{
+  margin-left:auto;
+  display:flex; align-items:center; gap:6px;
+  background: var(--panel2); border:1px solid var(--border);
+  border-radius:99px; padding:7px 13px;
+  font-family: var(--f-mono); font-size:.78rem; color:var(--sun);
+  white-space:nowrap;
+}
+
+/* ============================================================
+   VIEWS
+============================================================ */
+.view{ display:none; }
+.view.active{ display:block; }
+
+/* ============================================================
+   HOME — GRID DE DIAS
+============================================================ */
+.hero-banner{
+  margin: 4px 18px 22px;
+  padding: 22px 22px 20px;
+  border-radius: var(--r);
+  background: linear-gradient(135deg, #2B1620, var(--panel));
+  border: 1px solid var(--border);
+  position:relative;
+  overflow:hidden;
+}
+.hero-banner::after{
+  content:'';
+  position:absolute; right:-30px; top:-30px;
+  width:140px; height:140px; border-radius:50%;
+  background: radial-gradient(circle, var(--coral-glow), transparent 70%);
+}
+.hero-banner .eyebrow{
+  font-family: var(--f-mono); font-size:.7rem; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--coral); margin-bottom:8px;
+}
+.hero-banner h2{
+  font-family: var(--f-display); font-size:1.4rem; font-weight:700; color:var(--txt);
+  line-height:1.2; margin-bottom:8px; position:relative;
+}
+.hero-banner p{ font-size:.84rem; color:var(--txt-mid); position:relative; max-width:92%; }
+
+.week-grid{
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap:12px;
+  padding: 0 18px;
+}
+@media (max-width:380px){
+  .week-grid{ grid-template-columns: 1fr; }
+}
+
+.day-card{
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 18px;
+  cursor:pointer;
+  text-align:left;
+  transition: transform .15s var(--ease), border-color .2s, background .2s;
+  position:relative;
+  overflow:hidden;
+  display:flex; flex-direction:column; gap:10px;
+  min-height:128px;
+}
+.day-card:active{ transform: scale(.97); }
+.day-card:hover{ border-color: var(--txt-dim); }
+.day-card .bar{
+  position:absolute; left:0; top:0; bottom:0; width:4px;
+}
+.day-card .dow{
+  font-family: var(--f-mono); font-size:.68rem; letter-spacing:.08em;
+  text-transform:uppercase; color: var(--txt-dim);
+}
+.day-card h3{
+  font-family: var(--f-display); font-size:1rem; font-weight:600; color:var(--txt);
+  line-height:1.25;
+}
+.day-card .ex-count{
+  margin-top:auto;
+  font-size:.76rem; color:var(--txt-dim);
+  display:flex; align-items:center; gap:6px;
+}
+.day-card .done-check{
+  position:absolute; top:14px; right:14px;
+  width:24px; height:24px; border-radius:50%;
+  background: var(--done-dim); color: var(--done);
+  display:none; align-items:center; justify-content:center;
+  font-size:.8rem; font-weight:700;
+}
+.day-card.is-complete .done-check{ display:flex; }
+.day-card.is-complete{ border-color: var(--done); }
+
+/* cores por foco do dia */
+.day-card[data-color="pernas"]   .bar{ background: var(--coral); }
+.day-card[data-color="superior"] .bar{ background: #4ADE80; }
+.day-card[data-color="gluteo"]   .bar{ background: var(--teal); }
+.day-card[data-color="hiit"]     .bar{ background: var(--sun); }
+.day-card[data-color="fullbody"] .bar{ background: #FB923C; }
+
+/* ============================================================
+   PROGRESS STRIP
+============================================================ */
+.progress-strip{
+  margin: 22px 18px 0;
+  background: var(--panel);
+  border:1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px 18px;
+  display:flex; align-items:center; gap:16px;
+}
+.progress-strip .ps-label{ font-family:var(--f-mono); font-size:.7rem; color:var(--txt-dim); text-transform:uppercase; letter-spacing:.06em; }
+.progress-strip .ps-track{
+  flex:1; height:8px; background:var(--panel2); border-radius:99px; overflow:hidden;
+}
+.progress-strip .ps-fill{
+  height:100%; background: linear-gradient(90deg, var(--coral), var(--sun));
+  border-radius:99px; transition: width .5s var(--ease);
+}
+.progress-strip .ps-val{ font-family:var(--f-mono); font-size:.8rem; color:var(--txt); }
+
+/* ============================================================
+   DETALHE DO DIA
+============================================================ */
+.day-view-header{
+  display:flex; align-items:center; gap:14px;
+  padding: calc(16px + var(--safe-t)) 18px 16px;
+  position:sticky; top:0; z-index:40;
+  background: rgba(21,14,22,.85); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-s);
+}
+.back-btn{
+  width:38px; height:38px; border-radius:50%;
+  background: var(--panel2); border:1px solid var(--border);
+  color: var(--txt); display:flex; align-items:center; justify-content:center;
+  cursor:pointer; flex-shrink:0; font-size:1.1rem;
+  transition: border-color .2s;
+}
+.back-btn:hover{ border-color: var(--coral); }
+.day-view-header .title-block{ flex:1; min-width:0; }
+.day-view-header h2{
+  font-family: var(--f-display); font-size:1.05rem; font-weight:700; color:var(--txt);
+  line-height:1.25;
+}
+.day-view-header p{ font-size:.74rem; color:var(--txt-dim); }
+
+.day-progress-mini{
+  font-family: var(--f-mono); font-size:.76rem; color:var(--coral);
+  flex-shrink:0;
+}
+
+.exercise-list{
+  padding: 18px 18px 100px;
+  display:flex; flex-direction:column; gap:12px;
+}
+
+.ex-card{
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow:hidden;
+  transition: border-color .2s, opacity .25s;
+}
+.ex-card.is-done{
+  border-color: var(--done);
+  opacity:.6;
+}
+.ex-card-top{
+  display:flex; align-items:center; gap:14px;
+  padding: 16px 16px;
+}
+.ex-num{
+  width:30px; height:30px; border-radius:10px;
+  background: var(--panel2); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--f-mono); font-size:.82rem; color:var(--txt-mid);
+  flex-shrink:0;
+}
+.ex-card.is-done .ex-num{ background: var(--done-dim); border-color:var(--done); color:var(--done); }
+.ex-info{ flex:1; min-width:0; }
+.ex-name{
+  font-family: var(--f-display); font-size:.92rem; font-weight:600; color:var(--txt);
+  display:flex; align-items:center; gap:8px;
+  cursor:pointer;
+  width:fit-content;
+}
+.ex-name .search-ic{ font-size:.72rem; color:var(--txt-dim); transition:color .2s; }
+.ex-name:hover .search-ic{ color: var(--coral); }
+.ex-meta{
+  display:flex; gap:10px; flex-wrap:wrap; margin-top:5px;
+  font-family: var(--f-mono); font-size:.74rem; color:var(--txt-dim);
+}
+.ex-meta .eq{ color: var(--txt-mid); }
+.ex-meta .sr{ color: var(--sun); }
+.ex-meta .rest-tag{ color: var(--teal); }
+
+.ex-action{ flex-shrink:0; }
+.start-btn{
+  font-family: var(--f-mono); font-size:.74rem; font-weight:700;
+  letter-spacing:.04em; text-transform:uppercase;
+  background: var(--coral-dim); border:1px solid var(--coral);
+  color: var(--coral); padding:9px 14px; border-radius:var(--rs);
+  cursor:pointer; transition: background .2s;
+  white-space:nowrap;
+}
+.start-btn:hover{ background: rgba(255,77,126,.25); }
+.done-badge{
+  font-family: var(--f-mono); font-size:.74rem; font-weight:700;
+  color: var(--done); display:flex; align-items:center; gap:6px;
+}
+
+/* ============================================================
+   TIMER FULLSCREEN
+============================================================ */
+.timer-screen{
+  position:fixed; inset:0; z-index:200;
+  background: var(--void);
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  padding: calc(20px + var(--safe-t)) 24px calc(24px + var(--safe-b));
+}
+.timer-screen.open{ display:flex; }
+
+.timer-top{
+  width:100%; max-width:420px;
+  display:flex; align-items:center; gap:14px;
+  margin-bottom: 8px;
+}
+.timer-top .ex-tag{
+  font-family: var(--f-mono); font-size:.72rem; color:var(--txt-dim);
+  text-transform:uppercase; letter-spacing:.08em;
+}
+
+.timer-body{
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  width:100%; max-width:420px;
+}
+
+.timer-phase-label{
+  font-family: var(--f-mono); font-size:.78rem; letter-spacing:.12em;
+  text-transform:uppercase; margin-bottom:18px;
+  padding: 6px 16px; border-radius:99px;
+  border:1px solid;
+}
+.timer-phase-label.work{ color: var(--coral); border-color: var(--coral); background: var(--coral-dim); }
+.timer-phase-label.rest{ color: var(--teal); border-color: var(--teal); background: var(--teal-dim); }
+
+.ring-wrap{
+  position:relative;
+  width: min(78vw, 280px); height: min(78vw, 280px);
+  margin-bottom: 26px;
+}
+.ring-wrap svg{ width:100%; height:100%; transform: rotate(-90deg); }
+.ring-bg{ fill:none; stroke: var(--panel2); stroke-width:10; }
+.ring-fg{
+  fill:none; stroke-width:10; stroke-linecap:round;
+  transition: stroke-dashoffset .25s linear, stroke .3s;
+}
+.ring-fg.work{ stroke: var(--coral); filter: drop-shadow(0 0 10px var(--coral-glow)); }
+.ring-fg.rest{ stroke: var(--teal); filter: drop-shadow(0 0 10px var(--teal-glow)); }
+
+.ring-center{
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+.timer-clock{
+  font-family: var(--f-mono); font-weight:700;
+  font-size: clamp(2.6rem, 11vw, 3.6rem);
+  color: var(--txt); line-height:1; letter-spacing:-.02em;
+}
+.timer-clock.pulse{ animation: pulseScale 1s var(--ease) infinite; }
+@keyframes pulseScale{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.04); } }
+.timer-sub{ font-family: var(--f-mono); font-size:.78rem; color:var(--txt-dim); margin-top:6px; }
+
+.timer-exname{
+  font-family: var(--f-display); font-size:1.25rem; font-weight:700; color:var(--txt);
+  text-align:center; margin-bottom:6px;
+  line-height:1.25;
+}
+.timer-target{
+  font-family: var(--f-mono); font-size:.86rem; color: var(--sun);
+  margin-bottom: 30px; text-align:center;
+}
+
+.timer-controls{
+  display:flex; gap:12px; width:100%; max-width:420px;
+}
+.tbtn{
+  flex:1; padding:16px; border-radius:var(--r);
+  font-family: var(--f-mono); font-weight:700; font-size:.86rem;
+  letter-spacing:.04em; text-transform:uppercase;
+  border:none; cursor:pointer; transition: filter .15s, transform .1s;
+}
+.tbtn:active{ transform: scale(.97); }
+.tbtn.ghost{
+  background: var(--panel2); color:var(--txt-mid); border:1px solid var(--border);
+}
+.tbtn.ghost:hover{ color:var(--txt); }
+.tbtn.primary-coral{ background: var(--coral); color: var(--void); }
+.tbtn.primary-coral:hover{ filter:brightness(1.1); }
+.tbtn.primary-teal{ background: var(--teal); color: var(--void); }
+.tbtn.primary-teal:hover{ filter:brightness(1.1); }
+.tbtn.primary-done{ background: var(--done); color: var(--void); }
+
+.timer-skip{
+  margin-top:14px;
+  font-family: var(--f-mono); font-size:.76rem; color:var(--txt-dim);
+  background:none; border:none; cursor:pointer; text-decoration:underline;
+  text-underline-offset:3px;
+}
+.timer-skip:hover{ color:var(--txt-mid); }
+
+/* ============================================================
+   COMPLETION MODAL
+============================================================ */
+.complete-overlay{
+  position:fixed; inset:0; z-index:300;
+  background: rgba(0,0,0,.7);
+  display:none; align-items:center; justify-content:center;
+  padding: 24px;
+}
+.complete-overlay.open{ display:flex; }
+.complete-card{
+  background: var(--panel);
+  border: 1px solid var(--sun);
+  border-radius: var(--r);
+  padding: 36px 28px;
+  text-align:center;
+  max-width: 360px; width:100%;
+  box-shadow: 0 0 60px rgba(255,200,87,.15);
+}
+.complete-emoji{ font-size:3rem; margin-bottom:14px; }
+.complete-card h2{
+  font-family: var(--f-display); font-size:1.3rem; font-weight:700; color:var(--txt);
+  margin-bottom:8px;
+}
+.complete-card p{ font-size:.88rem; color:var(--txt-mid); margin-bottom:24px; line-height:1.5; }
+.complete-card .btn-confirm{
+  width:100%; padding:14px;
+  background: var(--sun); color:var(--void);
+  font-family:var(--f-mono); font-weight:700; font-size:.85rem;
+  text-transform:uppercase; letter-spacing:.04em;
+  border:none; border-radius:var(--rs); cursor:pointer;
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+.toast-wrap{
+  position:fixed; bottom: calc(20px + var(--safe-b)); left:50%; transform:translateX(-50%);
+  z-index:250; display:flex; flex-direction:column; gap:8px; align-items:center;
+  width: calc(100% - 36px); max-width: 420px;
+}
+.toast{
+  background: var(--panel2); border:1px solid var(--done);
+  border-radius: var(--rs); padding: 12px 18px;
+  font-size:.84rem; color:var(--txt); text-align:center;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  animation: toastIn .3s var(--ease);
+}
+@keyframes toastIn{ from{ opacity:0; transform:translateY(10px);} to{ opacity:1; transform:translateY(0);} }
+
+/* ============================================================
+   FOOTER NOTE
+============================================================ */
+.golden-rules{
+  margin: 30px 18px 0;
+  padding: 18px 20px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+}
+.golden-rules h4{
+  font-family: var(--f-mono); font-size:.7rem; text-transform:uppercase;
+  letter-spacing:.08em; color: var(--sun); margin-bottom:10px;
+}
+.golden-rules ul{ list-style:none; display:flex; flex-direction:column; gap:8px; }
+.golden-rules li{ font-size:.82rem; color:var(--txt-mid); padding-left:18px; position:relative; line-height:1.5; }
+.golden-rules li::before{ content:'•'; position:absolute; left:0; color:var(--coral); }
+.golden-rules strong{ color:var(--txt); }
+
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     HEADER
+============================================================ -->
+<div class="app-header">
+  <div class="avatar-ring">N</div>
+  <div class="header-text">
+    <h1>Treino da Nathaly</h1>
+    <p>Emagrecimento · Tonificação · Core</p>
+  </div>
+  <div class="streak-pill">🔥 <span id="streak-val">0</span> dias</div>
+</div>
+
+<!-- ============================================================
+     VIEW: HOME
+============================================================ -->
+<div class="view active" id="view-home">
+  <div class="hero-banner">
+    <div class="eyebrow">Estratégia da semana</div>
+    <h2>Frequência cardíaca lá em cima, sempre.</h2>
+    <p>Descansos curtos de propósito (45s a 1m) pra manter o gasto calórico alto. Controle a descida, intensidade nas repetições.</p>
+  </div>
+
+  <div class="week-grid" id="week-grid"></div>
+
+  <div class="progress-strip">
+    <div class="ps-label">Semana</div>
+    <div class="ps-track"><div class="ps-fill" id="week-fill" style="width:0%"></div></div>
+    <div class="ps-val" id="week-val">0/5</div>
+  </div>
+
+  <div class="golden-rules">
+    <h4>Regras de ouro</h4>
+    <ul>
+      <li><strong>Descanso controlado:</strong> tempos curtos (45s–1m) mantêm o coração acelerado e otimizam a queima.</li>
+      <li><strong>Consistência:</strong> controle a descida, intensidade alta nas repetições.</li>
+      <li><strong>Déficit calórico:</strong> o treino protege a massa magra, mas o resultado vem com alimentação limpa.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================================
+     VIEW: DIA (lista de exercícios)
+============================================================ -->
+<div class="view" id="view-day">
+  <div class="day-view-header">
+    <button class="back-btn" id="btn-back-home">←</button>
+    <div class="title-block">
+      <h2 id="day-title">—</h2>
+      <p id="day-sub">—</p>
+    </div>
+    <div class="day-progress-mini" id="day-progress-mini">0/0</div>
+  </div>
+  <div class="exercise-list" id="exercise-list"></div>
+</div>
+
+<!-- ============================================================
+     TIMER FULLSCREEN
+============================================================ -->
+<div class="timer-screen" id="timer-screen">
+  <div class="timer-top">
+    <button class="back-btn" id="btn-back-day">←</button>
+    <span class="ex-tag" id="timer-ex-tag">Exercício 1 de 6</span>
+  </div>
+
+  <div class="timer-body">
+    <div class="timer-phase-label work" id="timer-phase-label">Em execução</div>
+
+    <div class="timer-exname" id="timer-exname">Nome do exercício</div>
+    <div class="timer-target" id="timer-target">4 séries × 10-15 reps</div>
+
+    <div class="ring-wrap">
+      <svg viewBox="0 0 200 200">
+        <circle class="ring-bg" cx="100" cy="100" r="90"></circle>
+        <circle class="ring-fg work" id="ring-fg" cx="100" cy="100" r="90" stroke-dasharray="565.5" stroke-dashoffset="0"></circle>
+      </svg>
+      <div class="ring-center">
+        <div class="timer-clock" id="timer-clock">00:00</div>
+        <div class="timer-sub" id="timer-sub">toque em iniciar</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="timer-controls" id="timer-controls">
+    <button class="tbtn ghost" id="btn-pause">Pausar</button>
+    <button class="tbtn primary-coral" id="btn-main-action">Concluir série</button>
+  </div>
+  <button class="timer-skip" id="btn-skip">pular esta etapa →</button>
+</div>
+
+<!-- ============================================================
+     COMPLETION MODAL
+============================================================ -->
+<div class="complete-overlay" id="complete-overlay">
+  <div class="complete-card">
+    <div class="complete-emoji">✨</div>
+    <h2 id="complete-title">Treino concluído!</h2>
+    <p id="complete-text">Você terminou o treino de hoje. Hidrate-se e mantenha a alimentação no foco — o resultado é a soma dos dois.</p>
+    <button class="btn-confirm" id="complete-confirm">Voltar ao início</button>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+/* ============================================================
+   DADOS DO TREINO (extraídos da planilha da Nathaly)
+============================================================ */
+const PLANO = [
+  {
+    id:'seg', dow:'Segunda-feira', grupo:'Inferiores (Quadríceps) + Cardio', color:'pernas',
+    exercicios:[
+      { nome:'Agachamento Goblet', equip:'Haltere moderado à frente', series:4, reps:'12 a 15', descanso:60 },
+      { nome:'Passada em Movimento / Avanço', equip:'Halteres nas mãos', series:3, reps:'14 passos totais', descanso:60 },
+      { nome:'Agachamento Sumô', equip:'Haltere entre as pernas', series:4, reps:'15', descanso:60 },
+      { nome:'Polichinelos (Estímulo Aeróbico)', equip:'Peso Corporal', series:3, reps:'45 segundos sem parar', descanso:30 },
+    ]
+  },
+  {
+    id:'ter', dow:'Terça-feira', grupo:'Superiores — Tonificação e Postura', color:'superior',
+    exercicios:[
+      { nome:'Remada Sentada', equip:'Elástico de pedal (amarelo)', series:4, reps:'15', descanso:45 },
+      { nome:'Supino Reto no Chão', equip:'Halteres leves/moderados', series:3, reps:'12 a 15', descanso:60 },
+      { nome:'Elevação Lateral', equip:'Halteres leves ou Elástico', series:4, reps:'12 a 15', descanso:45 },
+      { nome:'Tríceps no Elástico', equip:'Elástico preso no alto', series:4, reps:'15 (foco no tchauzinho)', descanso:45 },
+    ]
+  },
+  {
+    id:'qua', dow:'Quarta-feira', grupo:'Posterior de Coxa, Glúteos + Core', color:'gluteo',
+    exercicios:[
+      { nome:'Stiff (alongando bem a coxa)', equip:'Halteres', series:4, reps:'12', descanso:60 },
+      { nome:'Elevação Pélvica', equip:'Haltere no quadril + Miniband', series:4, reps:'15 (controle na subida)', descanso:60 },
+      { nome:'Monster Walk (Passada Lateral)', equip:'Mini-band nos joelhos', series:3, reps:'20 passos totais', descanso:45 },
+      { nome:'Abdominal Supra Reto', equip:'Peso Corporal', series:4, reps:'20 a 25', descanso:45 },
+    ]
+  },
+  {
+    id:'qui', dow:'Quinta-feira', grupo:'Circuito Queima de Gordura — HIIT', color:'hiit',
+    exercicios:[
+      { nome:'Agachamento Livre (sem carga)', equip:'Peso Corporal', series:4, reps:'20 (ritmo acelerado)', descanso:45 },
+      { nome:'Corrida Estacionária (joelhos altos)', equip:'Peso Corporal', series:4, reps:'45 segundos ativo', descanso:30 },
+      { nome:'Desenvolvimento de Ombros', equip:'Halteres leves', series:3, reps:'15', descanso:45 },
+      { nome:'Prancha Isométrica', equip:'Peso Corporal', series:4, reps:'30 a 45 segundos', descanso:45 },
+    ]
+  },
+  {
+    id:'sex', dow:'Sexta-feira', grupo:'Full Body — Corpo Todo Integrado', color:'fullbody',
+    exercicios:[
+      { nome:'Agachamento Goblet', equip:'Haltere moderado', series:3, reps:'12', descanso:60 },
+      { nome:'Remada Curvada', equip:'Halteres ou Elástico', series:3, reps:'12', descanso:60 },
+      { nome:'Rosca Martelo + Elevação Frontal', equip:'Halteres leves', series:3, reps:'12 (exercício conjugado)', descanso:60 },
+      { nome:'Abdominal Infra (Elevação de Pernas)', equip:'Peso Corporal', series:4, reps:'15', descanso:45 },
+    ]
+  },
+];
+
+/* ============================================================
+   STORAGE
+============================================================ */
+const LS_PROGRESS = 'nathaly_treino_progress_v1';
+const LS_STREAK   = 'nathaly_treino_streak_v1';
+
+function todayKey(){
+  return new Date().toISOString().slice(0,10);
+}
+function loadProgress(){
+  try{ return JSON.parse(localStorage.getItem(LS_PROGRESS)) || {}; }
+  catch{ return {}; }
+}
+function saveProgress(p){ localStorage.setItem(LS_PROGRESS, JSON.stringify(p)); }
+
+function loadStreak(){
+  try{ return JSON.parse(localStorage.getItem(LS_STREAK)) || { count:0, lastDate:null }; }
+  catch{ return { count:0, lastDate:null }; }
+}
+function saveStreak(s){ localStorage.setItem(LS_STREAK, JSON.stringify(s)); }
+
+let progress = loadProgress();
+let streak = loadStreak();
+
+function getDayProgress(dayId){
+  const key = todayKey();
+  if(!progress[dayId] || progress[dayId].date !== key){
+    const day = PLANO.find(d=>d.id===dayId);
+    progress[dayId] = { date:key, done: day.exercicios.map(()=>false) };
+  }
+  return progress[dayId];
+}
+
+function isDayComplete(dayId){
+  const dp = getDayProgress(dayId);
+  return dp.done.length>0 && dp.done.every(Boolean);
+}
+
+function markExercise(dayId, idx, value){
+  const dp = getDayProgress(dayId);
+  dp.done[idx] = value;
+  progress[dayId] = dp;
+  saveProgress(progress);
+  if(isDayComplete(dayId)) updateStreak();
+}
+
+function updateStreak(){
+  const key = todayKey();
+  if(streak.lastDate === key) return;
+  const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+  if(streak.lastDate === yesterday){
+    streak.count += 1;
+  } else {
+    streak.count = 1;
+  }
+  streak.lastDate = key;
+  saveStreak(streak);
+}
+
+/* ============================================================
+   TOAST
+============================================================ */
+function toast(msg){
+  const w = document.getElementById('toast-wrap');
+  const el = document.createElement('div');
+  el.className='toast';
+  el.textContent = msg;
+  w.appendChild(el);
+  setTimeout(()=>el.remove(), 3200);
+}
+
+/* ============================================================
+   RENDER HOME
+============================================================ */
+function fmtClock(totalSec){
+  const m = Math.floor(totalSec/60).toString().padStart(2,'0');
+  const s = Math.floor(totalSec%60).toString().padStart(2,'0');
+  return `${m}:${s}`;
+}
+
+function renderHome(){
+  const grid = document.getElementById('week-grid');
+  grid.innerHTML='';
+  let totalComplete = 0;
+
+  PLANO.forEach(day=>{
+    const dp = getDayProgress(day.id);
+    const done = dp.done.filter(Boolean).length;
+    const total = dp.done.length;
+    const complete = isDayComplete(day.id);
+    if(complete) totalComplete++;
+
+    const card = document.createElement('button');
+    card.className = 'day-card' + (complete ? ' is-complete' : '');
+    card.dataset.color = day.color;
+    card.innerHTML = `
+      <div class="bar"></div>
+      <div class="done-check">✓</div>
+      <div class="dow">${day.dow}</div>
+      <h3>${day.grupo}</h3>
+      <div class="ex-count">${done}/${total} exercícios · ${day.exercicios.length} no total</div>
+    `;
+    card.addEventListener('click', ()=> openDay(day.id));
+    grid.appendChild(card);
+  });
+
+  document.getElementById('week-fill').style.width = Math.round(totalComplete/PLANO.length*100)+'%';
+  document.getElementById('week-val').textContent = `${totalComplete}/${PLANO.length}`;
+  document.getElementById('streak-val').textContent = streak.count;
+}
+
+/* ============================================================
+   NAVEGAÇÃO ENTRE VIEWS
+============================================================ */
+let currentDayId = null;
+
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function openDay(dayId){
+  currentDayId = dayId;
+  renderDay();
+  showView('view-day');
+}
+
+document.getElementById('btn-back-home').addEventListener('click', ()=>{
+  renderHome();
+  showView('view-home');
+});
+
+/* ============================================================
+   RENDER DIA
+============================================================ */
+function renderDay(){
+  const day = PLANO.find(d=>d.id===currentDayId);
+  const dp = getDayProgress(currentDayId);
+
+  document.getElementById('day-title').textContent = day.grupo;
+  document.getElementById('day-sub').textContent = day.dow;
+
+  const done = dp.done.filter(Boolean).length;
+  document.getElementById('day-progress-mini').textContent = `${done}/${day.exercicios.length}`;
+
+  const list = document.getElementById('exercise-list');
+  list.innerHTML = '';
+
+  day.exercicios.forEach((ex, idx)=>{
+    const isDone = dp.done[idx];
+    const card = document.createElement('div');
+    card.className = 'ex-card' + (isDone ? ' is-done' : '');
+    card.innerHTML = `
+      <div class="ex-card-top">
+        <div class="ex-num">${isDone ? '✓' : idx+1}</div>
+        <div class="ex-info">
+          <div class="ex-name" data-search="${encodeURIComponent(ex.nome + ' exercício como fazer')}">
+            ${ex.nome} <span class="search-ic">🔍</span>
+          </div>
+          <div class="ex-meta">
+            <span class="eq">${ex.equip}</span>
+            <span class="sr">${ex.series}x ${ex.reps}</span>
+            <span class="rest-tag">⏱ ${ex.descanso}s descanso</span>
+          </div>
+        </div>
+        <div class="ex-action">
+          ${isDone
+            ? `<div class="done-badge">✓ Feito</div>`
+            : `<button class="start-btn" data-idx="${idx}">Iniciar</button>`}
+        </div>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  // bind: abrir pesquisa no google
+  list.querySelectorAll('.ex-name').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const q = el.dataset.search;
+      window.open(`https://www.google.com/search?q=${q}`, '_blank', 'noopener');
+    });
+  });
+
+  // bind: iniciar exercício
+  list.querySelectorAll('.start-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const idx = parseInt(btn.dataset.idx, 10);
+      openTimer(currentDayId, idx);
+    });
+  });
+}
+
+/* ============================================================
+   TIMER
+============================================================ */
+const RING_CIRC = 2 * Math.PI * 90; // r=90
+
+let timerState = {
+  dayId:null, idx:null,
+  phase:'work',
+  seconds:0,
+  restTotal:0,
+  interval:null,
+  paused:false,
+};
+
+function openTimer(dayId, idx){
+  const day = PLANO.find(d=>d.id===dayId);
+  const ex = day.exercicios[idx];
+
+  timerState = { dayId, idx, phase:'work', seconds:0, restTotal:ex.descanso, interval:null, paused:false };
+
+  document.getElementById('timer-ex-tag').textContent = `Exercício ${idx+1} de ${day.exercicios.length}`;
+  document.getElementById('timer-exname').textContent = ex.nome;
+  document.getElementById('timer-target').textContent = `${ex.series}x séries · ${ex.reps} repetições`;
+
+  setPhaseWork();
+  document.getElementById('timer-screen').classList.add('open');
+  startInterval();
+}
+
+function setPhaseWork(){
+  timerState.phase='work';
+  timerState.seconds=0;
+  const label = document.getElementById('timer-phase-label');
+  label.className='timer-phase-label work';
+  label.textContent='Em execução — cronometrando';
+  document.getElementById('ring-fg').className='ring-fg work';
+  document.getElementById('ring-fg').style.strokeDasharray = RING_CIRC;
+  document.getElementById('ring-fg').style.strokeDashoffset = 0;
+  document.getElementById('timer-sub').textContent='tempo da série';
+  document.getElementById('timer-clock').classList.remove('pulse');
+  document.getElementById('btn-main-action').textContent='Concluir série';
+  document.getElementById('btn-main-action').className='tbtn primary-coral';
+  document.getElementById('btn-pause').textContent='Pausar';
+  document.getElementById('btn-skip').textContent='pular para o descanso →';
+  renderClock();
+}
+
+function setPhaseRest(){
+  timerState.phase='rest';
+  timerState.seconds=timerState.restTotal;
+  const label = document.getElementById('timer-phase-label');
+  label.className='timer-phase-label rest';
+  label.textContent='Descanso — recupere o fôlego';
+  document.getElementById('ring-fg').className='ring-fg rest';
+  document.getElementById('timer-sub').textContent='descanso restante';
+  document.getElementById('timer-clock').classList.add('pulse');
+  document.getElementById('btn-main-action').textContent='Pular descanso';
+  document.getElementById('btn-main-action').className='tbtn primary-teal';
+  document.getElementById('btn-pause').textContent='Pausar';
+  document.getElementById('btn-skip').textContent='marcar como feito →';
+  renderClock();
+}
+
+function renderClock(){
+  document.getElementById('timer-clock').textContent = fmtClock(timerState.seconds);
+  if(timerState.phase==='rest'){
+    const pct = timerState.seconds / timerState.restTotal;
+    const offset = RING_CIRC * (1-pct);
+    document.getElementById('ring-fg').style.strokeDashoffset = offset;
+  } else {
+    const pct = Math.min(timerState.seconds/60, 1);
+    document.getElementById('ring-fg').style.strokeDashoffset = RING_CIRC * (1-pct);
+  }
+}
+
+function startInterval(){
+  clearInterval(timerState.interval);
+  timerState.interval = setInterval(()=>{
+    if(timerState.paused) return;
+    if(timerState.phase==='work'){
+      timerState.seconds++;
+    } else {
+      timerState.seconds--;
+      if(timerState.seconds<=0){
+        timerState.seconds=0;
+        renderClock();
+        finishRest();
+        return;
+      }
+    }
+    renderClock();
+  },1000);
+}
+
+document.getElementById('btn-pause').addEventListener('click', function(){
+  timerState.paused = !timerState.paused;
+  this.textContent = timerState.paused ? 'Retomar' : 'Pausar';
+});
+
+document.getElementById('btn-main-action').addEventListener('click', ()=>{
+  if(timerState.phase==='work'){
+    setPhaseRest();
+  } else {
+    finishRest();
+  }
+});
+
+document.getElementById('btn-skip').addEventListener('click', ()=>{
+  if(timerState.phase==='work'){
+    setPhaseRest();
+  } else {
+    finishRest();
+  }
+});
+
+function finishRest(){
+  markExercise(timerState.dayId, timerState.idx, true);
+  clearInterval(timerState.interval);
+  closeTimer();
+
+  const day = PLANO.find(d=>d.id===timerState.dayId);
+  renderDay();
+  toast(`✓ ${day.exercicios[timerState.idx].nome} concluído!`);
+
+  if(isDayComplete(timerState.dayId)){
+    setTimeout(()=> showCompleteModal(day), 400);
+  }
+}
+
+function closeTimer(){
+  clearInterval(timerState.interval);
+  document.getElementById('timer-screen').classList.remove('open');
+}
+
+document.getElementById('btn-back-day').addEventListener('click', ()=>{
+  clearInterval(timerState.interval);
+  closeTimer();
+  renderDay();
+});
+
+/* ============================================================
+   COMPLETION MODAL
+============================================================ */
+function showCompleteModal(day){
+  document.getElementById('complete-title').textContent = 'Treino concluído! ✨';
+  document.getElementById('complete-text').textContent =
+    `Você fechou o treino de ${day.dow.toLowerCase()} — ${day.grupo}. Sequência atual: ${streak.count} dia(s). Hidrate-se e mantenha a alimentação no foco — o resultado é a soma dos dois.`;
+  document.getElementById('complete-overlay').classList.add('open');
+}
+document.getElementById('complete-confirm').addEventListener('click', ()=>{
+  document.getElementById('complete-overlay').classList.remove('open');
+  renderHome();
+  showView('view-home');
+});
+
+/* ============================================================
+   INIT
+============================================================ */
+renderHome();
+</script>
+</body>
+</html>
