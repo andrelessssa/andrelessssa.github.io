@@ -297,6 +297,28 @@ body{
   font-family: var(--f-mono); font-size:.74rem; font-weight:700;
   color: var(--done); display:flex; align-items:center; gap:6px;
 }
+.serie-counter{
+  font-family: var(--f-mono); font-weight:700;
+  font-size: clamp(1.5rem, 6vw, 2.2rem);
+  letter-spacing:.04em;
+  padding: 10px 28px;
+  border-radius: 99px;
+  margin-bottom: 14px;
+  border: 2px solid;
+  line-height:1;
+}
+.serie-counter.work{
+  color: var(--coral);
+  border-color: var(--coral);
+  background: var(--coral-dim);
+  box-shadow: 0 0 20px var(--coral-glow);
+}
+.serie-counter.rest{
+  color: var(--teal);
+  border-color: var(--teal);
+  background: var(--teal-dim);
+  box-shadow: 0 0 20px var(--teal-glow);
+}
 .undo-btn{
   font-family: var(--f-mono); font-size:.72rem; font-weight:700;
   letter-spacing:.03em;
@@ -550,6 +572,7 @@ body{
   <div class="timer-body">
     <div class="timer-phase-label work" id="timer-phase-label">Em execução</div>
 
+    <div class="serie-counter work" id="serie-counter">SÉRIE 1 DE ?</div>
     <div class="timer-exname" id="timer-exname">Nome do exercício</div>
     <div class="timer-target" id="timer-target">4 séries × 10-15 reps</div>
 
@@ -858,7 +881,8 @@ function openTimer(dayId, idx){
   const day = PLANO.find(d=>d.id===dayId);
   const ex = day.exercicios[idx];
 
-  timerState = { dayId, idx, phase:'work', seconds:0, restTotal:ex.descanso, interval:null, paused:false };
+  const totalSeries = ex.series || 3;
+  timerState = { dayId, idx, phase:'work', seconds:0, restTotal:ex.descanso, interval:null, paused:false, serieAtual:1, totalSeries };
 
   document.getElementById('timer-ex-tag').textContent = `Exercício ${idx+1} de ${day.exercicios.length}`;
   document.getElementById('timer-exname').textContent = ex.nome;
@@ -875,6 +899,8 @@ function setPhaseWork(){
   const label = document.getElementById('timer-phase-label');
   label.className='timer-phase-label work';
   label.textContent='Em execução — cronometrando';
+  const sc = document.getElementById('serie-counter');
+  if(sc){ sc.textContent=`SÉRIE ${timerState.serieAtual} DE ${timerState.totalSeries}`; sc.className='serie-counter work'; }
   document.getElementById('ring-fg').className='ring-fg work';
   document.getElementById('ring-fg').style.strokeDasharray = RING_CIRC;
   document.getElementById('ring-fg').style.strokeDashoffset = 0;
@@ -893,6 +919,8 @@ function setPhaseRest(){
   const label = document.getElementById('timer-phase-label');
   label.className='timer-phase-label rest';
   label.textContent='Descanso — recupere o fôlego';
+  const scr = document.getElementById('serie-counter');
+  if(scr){ scr.textContent=`SÉRIE ${timerState.serieAtual} DE ${timerState.totalSeries}`; scr.className='serie-counter rest'; }
   document.getElementById('ring-fg').className='ring-fg rest';
   document.getElementById('timer-sub').textContent='descanso restante';
   document.getElementById('timer-clock').classList.add('pulse');
@@ -955,15 +983,41 @@ document.getElementById('btn-skip').addEventListener('click', ()=>{
   }
 });
 
-function finishRest(){
-  markExercise(timerState.dayId, timerState.idx, true);
-  clearInterval(timerState.interval);
-  closeTimer();
+function playBeep(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    // 3 bips curtos
+    [0, 0.18, 0.36].forEach(offset => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime + offset);
+      gain.gain.setValueAtTime(0.6, ctx.currentTime + offset);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + offset + 0.15);
+      osc.start(ctx.currentTime + offset);
+      osc.stop(ctx.currentTime + offset + 0.15);
+    });
+  } catch(e){}
+}
 
+function finishRest(){
+  clearInterval(timerState.interval);
+  playBeep();
+
+  if(timerState.serieAtual < timerState.totalSeries){
+    timerState.serieAtual++;
+    toast(`✓ Série ${timerState.serieAtual - 1} concluída! Iniciando série ${timerState.serieAtual}…`);
+    setPhaseWork();
+    startInterval();
+    return;
+  }
+
+  markExercise(timerState.dayId, timerState.idx, true);
+  closeTimer();
   const day = PLANO.find(d=>d.id===timerState.dayId);
   renderDay();
-  toast(`✓ ${day.exercicios[timerState.idx].nome} concluído!`);
-
+  toast(`💪 ${day.exercicios[timerState.idx].nome} concluído! Todas as ${timerState.totalSeries} séries feitas.`);
   if(isDayComplete(timerState.dayId)){
     setTimeout(()=> showCompleteModal(day), 400);
   }
