@@ -297,6 +297,15 @@ body{
   font-family: var(--f-mono); font-size:.74rem; font-weight:700;
   color: var(--done); display:flex; align-items:center; gap:6px;
 }
+.undo-btn{
+  font-family: var(--f-mono); font-size:.72rem; font-weight:700;
+  letter-spacing:.03em;
+  background: var(--done-dim); border:1px solid var(--done);
+  color: var(--done); padding:9px 12px; border-radius:var(--rs);
+  cursor:pointer; transition: background .2s;
+  white-space:nowrap;
+}
+.undo-btn:hover{ background: rgba(74,222,128,.28); }
 
 /* ============================================================
    TIMER FULLSCREEN
@@ -797,7 +806,7 @@ function renderDay(){
         </div>
         <div class="ex-action">
           ${isDone
-            ? `<div class="done-badge">✓ Feito</div>`
+            ? `<button class="undo-btn" data-idx="${idx}">↩ Desfazer</button>`
             : `<button class="start-btn" data-idx="${idx}">Iniciar</button>`}
         </div>
       </div>
@@ -818,6 +827,15 @@ function renderDay(){
     btn.addEventListener('click', ()=>{
       const idx = parseInt(btn.dataset.idx, 10);
       openTimer(currentDayId, idx);
+    });
+  });
+
+  // bind: desfazer exercício
+  list.querySelectorAll('.undo-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      markExercise(currentDayId, parseInt(btn.dataset.idx, 10), false);
+      renderDay();
+      toast('Exercício desmarcado — pode repetir!');
     });
   });
 }
