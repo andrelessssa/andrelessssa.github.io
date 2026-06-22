@@ -981,8 +981,26 @@ document.getElementById('btn-skip').addEventListener('click', ()=>{
   }
 });
 
+function playBeep(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, 0.18, 0.36].forEach(offset => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime + offset);
+      gain.gain.setValueAtTime(0.6, ctx.currentTime + offset);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + offset + 0.15);
+      osc.start(ctx.currentTime + offset);
+      osc.stop(ctx.currentTime + offset + 0.15);
+    });
+  } catch(e){}
+}
+
 function finishRest(){
   clearInterval(timerState.interval);
+  playBeep();
 
   if(timerState.serieAtual < timerState.totalSeries){
     timerState.serieAtual++;
