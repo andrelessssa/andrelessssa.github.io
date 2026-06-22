@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
-  <title>André · Treino</title>
+  <title>Guilherme · Treino</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap');
 
@@ -317,7 +317,7 @@
     }
 
     /* ============================================================
-   BASE STYLES (mesmo do original)
+   BASE STYLES
 ============================================================ */
     * {
       margin: 0;
@@ -1218,25 +1218,20 @@
 
 <body>
 
-  <!-- HEADER -->
   <div class="app-header">
-    <div class="avatar-ring">A</div>
+    <div class="avatar-ring">G</div>
     <div class="header-text">
-      <h1>Treino do André</h1>
-      <p id="header-sub">Hipertrofia · 80kg · 160g proteína/dia</p>
+      <h1>Treino do Guilherme</h1>
+      <p id="header-sub">Hipertrofia · Guilherme Lessa</p>
     </div>
     <div class="streak-pill">🔥 <span id="streak-val">0</span> dias</div>
   </div>
 
-  <!-- TOGGLE CASA / ACADEMIA -->
   <div class="env-toggle" id="env-toggle">
     <button class="env-btn active" id="btn-casa" onclick="setEnv('casa')">🏠 Casa</button>
     <button class="env-btn" id="btn-gym" onclick="setEnv('gym')">🏋️ Academia</button>
   </div>
 
-  <!-- ============================================================
-     VIEW: HOME
-============================================================ -->
   <div class="view active" id="view-home">
     <div class="hero-banner panel-surface">
       <div class="eyebrow accent-color" id="banner-eyebrow">Estratégia da semana</div>
@@ -1258,9 +1253,6 @@
     <div class="golden-rules panel-surface" id="golden-rules-block"></div>
   </div>
 
-  <!-- ============================================================
-     VIEW: DIA
-============================================================ -->
   <div class="view" id="view-day">
     <div class="day-view-header">
       <button class="back-btn" id="btn-back-home">←</button>
@@ -1268,12 +1260,13 @@
         <h2 id="day-title">—</h2>
         <p id="day-sub">—</p>
       </div>
+      <button class="back-btn" onclick="resetarDiaCompleto()" title="Zerar Treino"
+        style="margin-right: 8px;">🔄</button>
       <div class="day-progress-mini accent-color" id="day-progress-mini">0/0</div>
     </div>
     <div class="exercise-list" id="exercise-list"></div>
   </div>
 
-  <!-- TIMER -->
   <div class="timer-screen" id="timer-screen">
     <div class="timer-top">
       <button class="back-btn" id="btn-back-day">←</button>
@@ -1302,7 +1295,6 @@
     <button class="timer-skip" id="btn-skip">pular esta etapa →</button>
   </div>
 
-  <!-- COMPLETION MODAL -->
   <div class="complete-overlay" id="complete-overlay">
     <div class="complete-card panel-surface">
       <div class="complete-emoji">💪</div>
@@ -1358,7 +1350,7 @@
           { nome: 'Crucifixo em Pé', equip: 'Elástico extensor fixado', series: 3, reps: '12 a 15', descanso: 60 },
           { nome: 'Elevação Lateral', equip: 'Elástico Extensor (tensão alta)', series: 4, reps: '15', descanso: 60 },
           { nome: 'Elevação Frontal', equip: 'Halteres ou Elástico', series: 3, reps: '10 a 12', descanso: 60 },
-          { nome: 'Tríceps no Elástico', equip: 'Elástico preso no alto', series: 4, reps: '12 (até à falha)', descanso: 60 },
+          { nome: 'Tríceps no Elástico', equip: 'Elástico preso no alto', series: 4, reps: '12 (hasta la falla)', descanso: 60 },
         ]
       },
       {
@@ -1375,13 +1367,11 @@
 
     /* ============================================================
        DADOS — ACADEMIA
-       Fase atual salva no storage. Exibida em badge.
-       5ª = repete 2ª  |  6ª = repete 3ª
     ============================================================ */
-    const FASES_GYM = { label: 'Fase 1', series: 3, reps: 12 }; // padrão; fase real via storage
+    const FASES_GYM = { label: 'Fase 1', series: 3, reps: 12 };
 
     function faseAtual() {
-      try { return JSON.parse(localStorage.getItem('andre_gym_fase')) || { num: 1, series: 3, reps: 12 }; }
+      try { return JSON.parse(localStorage.getItem('guilherme_gym_fase')) || { num: 1, series: 3, reps: 12 }; }
       catch { return { num: 1, series: 3, reps: 12 }; }
     }
 
@@ -1473,7 +1463,6 @@
       ]
     };
 
-    // 5ª repete 2ª, 6ª repete 3ª
     const GYM_QUI = { ...GYM_SEG, id: 'qui', dow: 'Quinta-feira' };
     const GYM_SEX = { ...GYM_TER, id: 'sex', dow: 'Sexta-feira' };
 
@@ -1482,7 +1471,7 @@
     /* ============================================================
        ESTADO
     ============================================================ */
-    let env = localStorage.getItem('andre_env') || 'casa'; // 'casa' | 'gym'
+    let env = localStorage.getItem('guilherme_env') || 'casa';
 
     function planoAtivo() { return env === 'gym' ? PLANO_GYM : PLANO_CASA; }
 
@@ -1497,8 +1486,8 @@
     }
     function saveProgress(key, p) { localStorage.setItem(key, JSON.stringify(p)); }
 
-    function progressKey() { return env === 'gym' ? 'andre_gym_progress_v2' : 'andre_casa_progress_v2'; }
-    function streakKey() { return env === 'gym' ? 'andre_gym_streak_v2' : 'andre_casa_streak_v2'; }
+    function progressKey() { return env === 'gym' ? 'guilherme_gym_progress_v2' : 'guilherme_casa_progress_v2'; }
+    function streakKey() { return env === 'gym' ? 'guilherme_gym_streak_v2' : 'guilherme_casa_streak_v2'; }
 
     let progress = loadProgress(progressKey());
     let streak = loadStreak(streakKey());
@@ -1546,7 +1535,7 @@
     ============================================================ */
     function setEnv(e) {
       env = e;
-      localStorage.setItem('andre_env', e);
+      localStorage.setItem('guilherme_env', e);
       progress = loadProgress(progressKey());
       streak = loadStreak(streakKey());
 
@@ -1554,7 +1543,6 @@
       document.getElementById('btn-casa').classList.toggle('active', e === 'casa');
       document.getElementById('btn-gym').classList.toggle('active', e === 'gym');
 
-      // banner e regras dinamicamente
       if (e === 'gym') {
         document.getElementById('header-sub').textContent = 'Academia · Hipertrofia avançada';
         document.getElementById('banner-eyebrow').textContent = 'Academia — modo avançado';
@@ -1568,7 +1556,7 @@
         <li><strong>HIIT na esteira:</strong> sempre ao fim — 5min aquecimento, 10 tiros 30/30, 5min volta calma.</li>
       </ul>`;
       } else {
-        document.getElementById('header-sub').textContent = 'Hipertrofia · 80kg · 160g proteína/dia';
+        document.getElementById('header-sub').textContent = 'Hipertrofia · Guilherme Lessa';
         document.getElementById('banner-eyebrow').textContent = 'Estratégia da semana';
         document.getElementById('banner-title').textContent = 'Intensidade alta, falha controlada.';
         document.getElementById('banner-text').textContent = 'Cadência: 1-2s na subida, 3s segurando a descida. Se passar do teto de reps com facilidade, suba a carga.';
@@ -1618,7 +1606,6 @@
         card.className = 'day-card' + (complete ? ' is-complete' : '');
         card.dataset.color = day.color;
 
-        // badge "repete" pra 5ª e 6ª no modo gym
         const repeatTag = (env === 'gym' && day.id === 'qui') ? '<span style="font-family:var(--f-mono);font-size:.62rem;color:var(--txt-dim)"> · repete 2ª</span>'
           : (env === 'gym' && day.id === 'sex') ? '<span style="font-family:var(--f-mono);font-size:.62rem;color:var(--txt-dim)"> · repete 3ª</span>'
             : '';
@@ -1667,7 +1654,6 @@
       const list = document.getElementById('exercise-list');
       list.innerHTML = '';
 
-      // aquecimento + fase badge (modo academia)
       if (env === 'gym' && day.aquecimento) {
         const f = faseAtual();
         list.insertAdjacentHTML('beforeend', `
@@ -1704,7 +1690,7 @@
         </div>
         <div class="ex-action">
           ${isDone
-            ? `<div class="done-badge">✓ Feito</div>`
+            ? `<button class="start-btn" style="background:var(--done-dim); border-color:var(--done); color:var(--done);" onclick="desmarcarEx(${idx})">✓ Feito</button>`
             : `<button class="start-btn" data-idx="${idx}">Iniciar</button>`}
         </div>
       </div>
@@ -1715,7 +1701,7 @@
       list.querySelectorAll('.ex-name').forEach(el => {
         el.addEventListener('click', () => window.open(`https://www.google.com/search?q=${el.dataset.search}`, '_blank', 'noopener'));
       });
-      list.querySelectorAll('.start-btn').forEach(btn => {
+      list.querySelectorAll('.start-btn[data-idx]').forEach(btn => {
         btn.addEventListener('click', () => openTimer(currentDayId, parseInt(btn.dataset.idx, 10)));
       });
     }
@@ -1833,12 +1819,35 @@
     });
 
     /* ============================================================
+       FUNÇÕES NOVAS — DESMARCAR E RESETAR TREINO
+    ============================================================ */
+    // 🔄 Função para desmarcar um exercício específico
+    function desmarcarEx(idx) {
+      if (confirm('Deseja desmarcar este exercício e deixá-lo pendente?')) {
+        markExercise(currentDayId, idx, false);
+        renderDay();
+      }
+    }
+
+    // 🧹 Função para limpar e zerar o treino inteiro do dia atual
+    function resetarDiaCompleto() {
+      if (confirm('Tem certeza que deseja zerar todos os exercícios deste treino para começar novamente? 🧹')) {
+        const dp = getDayProgress(currentDayId);
+        dp.done = dp.done.map(() => false);
+        progress[currentDayId] = dp;
+        saveProgress(progressKey(), progress);
+        renderDay();
+        toast("Treino zerado! Bom treino! 🏋️‍♂️");
+      }
+    }
+
+    /* ============================================================
        INIT
     ============================================================ */
     if (env === 'gym') document.body.classList.add('gym-mode');
     document.getElementById('btn-casa').classList.toggle('active', env === 'casa');
     document.getElementById('btn-gym').classList.toggle('active', env === 'gym');
-    setEnv(env); // aplica banner e regras corretos
+    setEnv(env);
   </script>
 </body>
 
