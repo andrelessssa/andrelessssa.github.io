@@ -178,7 +178,7 @@ body.gym-mode .env-btn.active{
 }
 
 /* ============================================================
-   BASE STYLES
+   BASE STYLES (mesmo do original)
 ============================================================ */
 *{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 html{ scroll-behavior:smooth; }
@@ -386,6 +386,15 @@ body.gym-mode .hero-banner{ background: linear-gradient(135deg, #0A1820, var(--p
 }
 .start-btn:hover{ background: rgba(255,90,60,.25); }
 .done-badge{ font-family: var(--f-mono); font-size:.74rem; font-weight:700; color: var(--done); display:flex; align-items:center; gap:6px; }
+.undo-btn{
+  font-family: var(--f-mono); font-size:.72rem; font-weight:700;
+  letter-spacing:.03em;
+  background: var(--done-dim); border:1px solid var(--done);
+  color: var(--done); padding:9px 12px; border-radius:var(--rs);
+  cursor:pointer; transition: background .2s;
+  white-space:nowrap;
+}
+.undo-btn:hover{ background: rgba(74,222,128,.28); }
 
 /* TIMER */
 .timer-screen{
@@ -489,20 +498,25 @@ body.gym-mode .golden-rules li::before{ color: var(--cyan); }
 </head>
 <body>
 
+<!-- HEADER -->
 <div class="app-header">
-  <div class="avatar-ring">G</div>
+  <div class="avatar-ring">A</div>
   <div class="header-text">
-    <h1>Treino do Guilherme</h1>
-    <p id="header-sub">Hipertrofia · Guilherme Lessa</p>
+    <h1>Treino do André</h1>
+    <p id="header-sub">Hipertrofia · 80kg · 160g proteína/dia</p>
   </div>
   <div class="streak-pill">🔥 <span id="streak-val">0</span> dias</div>
 </div>
 
+<!-- TOGGLE CASA / ACADEMIA -->
 <div class="env-toggle" id="env-toggle">
   <button class="env-btn active" id="btn-casa" onclick="setEnv('casa')">🏠 Casa</button>
   <button class="env-btn" id="btn-gym" onclick="setEnv('gym')">🏋️ Academia</button>
 </div>
 
+<!-- ============================================================
+     VIEW: HOME
+============================================================ -->
 <div class="view active" id="view-home">
   <div class="hero-banner panel-surface">
     <div class="eyebrow accent-color" id="banner-eyebrow">Estratégia da semana</div>
@@ -521,6 +535,9 @@ body.gym-mode .golden-rules li::before{ color: var(--cyan); }
   <div class="golden-rules panel-surface" id="golden-rules-block"></div>
 </div>
 
+<!-- ============================================================
+     VIEW: DIA
+============================================================ -->
 <div class="view" id="view-day">
   <div class="day-view-header">
     <button class="back-btn" id="btn-back-home">←</button>
@@ -533,6 +550,7 @@ body.gym-mode .golden-rules li::before{ color: var(--cyan); }
   <div class="exercise-list" id="exercise-list"></div>
 </div>
 
+<!-- TIMER -->
 <div class="timer-screen" id="timer-screen">
   <div class="timer-top">
     <button class="back-btn" id="btn-back-day">←</button>
@@ -560,6 +578,7 @@ body.gym-mode .golden-rules li::before{ color: var(--cyan); }
   <button class="timer-skip" id="btn-skip">pular esta etapa →</button>
 </div>
 
+<!-- COMPLETION MODAL -->
 <div class="complete-overlay" id="complete-overlay">
   <div class="complete-card panel-surface">
     <div class="complete-emoji">💪</div>
@@ -615,7 +634,7 @@ const PLANO_CASA = [
       { nome:'Crucifixo em Pé', equip:'Elástico extensor fixado', series:3, reps:'12 a 15', descanso:60 },
       { nome:'Elevação Lateral', equip:'Elástico Extensor (tensão alta)', series:4, reps:'15', descanso:60 },
       { nome:'Elevação Frontal', equip:'Halteres ou Elástico', series:3, reps:'10 a 12', descanso:60 },
-      { nome:'Tríceps no Elástico', equip:'Elástico preso no alto', series:4, reps:'12 (hasta la falla)', descanso:60 },
+      { nome:'Tríceps no Elástico', equip:'Elástico preso no alto', series:4, reps:'12 (até à falha)', descanso:60 },
     ]
   },
   {
@@ -632,11 +651,13 @@ const PLANO_CASA = [
 
 /* ============================================================
    DADOS — ACADEMIA
+   Fase atual salva no storage. Exibida em badge.
+   5ª = repete 2ª  |  6ª = repete 3ª
 ============================================================ */
-const FASES_GYM = { label:'Fase 1', series:3, reps:12 };
+const FASES_GYM = { label:'Fase 1', series:3, reps:12 }; // padrão; fase real via storage
 
 function faseAtual(){
-  try{ return JSON.parse(localStorage.getItem('guilherme_gym_fase')) || { num:1, series:3, reps:12 }; }
+  try{ return JSON.parse(localStorage.getItem('andre_gym_fase')) || { num:1, series:3, reps:12 }; }
   catch{ return { num:1, series:3, reps:12 }; }
 }
 
@@ -696,6 +717,7 @@ const GYM_QUA = {
   ]
 };
 
+// 5ª repete 2ª, 6ª repete 3ª
 const GYM_QUI = { ...GYM_SEG, id:'qui', dow:'Quinta-feira' };
 const GYM_SEX = { ...GYM_TER, id:'sex', dow:'Sexta-feira' };
 
@@ -704,24 +726,14 @@ const PLANO_GYM = [GYM_SEG, GYM_TER, GYM_QUA, GYM_QUI, GYM_SEX];
 /* ============================================================
    ESTADO
 ============================================================ */
-let env = localStorage.getItem('guilherme_env') || 'casa';
+let env = localStorage.getItem('andre_env') || 'casa'; // 'casa' | 'gym'
 
 function planoAtivo(){ return env === 'gym' ? PLANO_GYM : PLANO_CASA; }
 
 /* ============================================================
-   STORAGE & PERSISTÊNCIA ISOLADA
+   STORAGE
 ============================================================ */
-function progressKey(){ return env==='gym' ? 'guilherme_gym_progress_v2' : 'guilherme_casa_progress_v2'; }
-function streakKey(){   return env==='gym' ? 'guilherme_gym_streak_v2'   : 'guilherme_casa_streak_v2'; }
-function todayKey(){    return env + '_' + new Date().toISOString().slice(0,10); }
-
-// Instâncias de memória carregadas independentemente
-let progressCasa = loadProgress('guilherme_casa_progress_v2');
-let progressGym  = loadProgress('guilherme_gym_progress_v2');
-
-function getActiveProgressObject() {
-  return env === 'gym' ? progressGym : progressCasa;
-}
+function todayKey(){ return new Date().toISOString().slice(0,10); }
 
 function loadProgress(key){
   try{ return JSON.parse(localStorage.getItem(key)) || {}; }
@@ -729,7 +741,12 @@ function loadProgress(key){
 }
 function saveProgress(key, p){ localStorage.setItem(key, JSON.stringify(p)); }
 
-let streak = loadStreak(streakKey());
+function progressKey(){ return env==='gym' ? 'andre_gym_progress_v2' : 'andre_casa_progress_v2'; }
+function streakKey(){   return env==='gym' ? 'andre_gym_streak_v2'   : 'andre_casa_streak_v2'; }
+
+let progress = loadProgress(progressKey());
+let streak   = loadStreak(streakKey());
+
 function loadStreak(k){
   try{ return JSON.parse(localStorage.getItem(k)) || {count:0,lastDate:null}; }
   catch{ return {count:0,lastDate:null}; }
@@ -739,13 +756,12 @@ function saveStreakData(){ localStorage.setItem(streakKey(), JSON.stringify(stre
 function getDayProgress(dayId){
   const key = todayKey();
   const plano = planoAtivo();
-  const currentProgress = getActiveProgressObject();
-  
-  if(!currentProgress[dayId] || currentProgress[dayId].date !== key){
-    const day = plano.find(d=>d.id===dayId);
-    currentProgress[dayId] = { date:key, done: day.exercicios.map(()=>false) };
+  const day = plano.find(d=>d.id===dayId);
+  // reinicia se: data diferente OU qtd de exercícios diferente do plano atual (ambiente trocado)
+  if(!progress[dayId] || progress[dayId].date !== key || progress[dayId].done.length !== day.exercicios.length){
+    progress[dayId] = { date:key, done: day.exercicios.map(()=>false) };
   }
-  return currentProgress[dayId];
+  return progress[dayId];
 }
 
 function isDayComplete(dayId){
@@ -756,18 +772,15 @@ function isDayComplete(dayId){
 function markExercise(dayId, idx, value){
   const dp = getDayProgress(dayId);
   dp.done[idx] = value;
-  
-  const currentProgress = getActiveProgressObject();
-  currentProgress[dayId] = dp;
-  
-  saveProgress(progressKey(), currentProgress);
+  progress[dayId] = dp;
+  saveProgress(progressKey(), progress);
   if(isDayComplete(dayId)) updateStreak();
 }
 
 function updateStreak(){
   const key = todayKey();
   if(streak.lastDate === key) return;
-  const yesterday = env + '_' + new Date(Date.now()-86400000).toISOString().slice(0,10);
+  const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
   streak.count = streak.lastDate === yesterday ? streak.count+1 : 1;
   streak.lastDate = key;
   saveStreakData();
@@ -778,17 +791,16 @@ function updateStreak(){
 ============================================================ */
 function setEnv(e){
   env = e;
-  localStorage.setItem('guilherme_env', e);
-  
-  // Recarrega as chaves isoladas ao alternar a aba
-  progressCasa = loadProgress('guilherme_casa_progress_v2');
-  progressGym  = loadProgress('guilherme_gym_progress_v2');
-  streak       = loadStreak(streakKey());
+  localStorage.setItem('andre_env', e);
+  progress = loadProgress(progressKey());  // recarrega progresso do ambiente correto
+  streak   = loadStreak(streakKey());
+  currentDayId = null; // garante que não carregue dia do ambiente anterior
 
   document.body.classList.toggle('gym-mode', e==='gym');
   document.getElementById('btn-casa').classList.toggle('active', e==='casa');
   document.getElementById('btn-gym').classList.toggle('active', e==='gym');
 
+  // banner e regras dinamicamente
   if(e==='gym'){
     document.getElementById('header-sub').textContent = 'Academia · Hipertrofia avançada';
     document.getElementById('banner-eyebrow').textContent = 'Academia — modo avançado';
@@ -802,7 +814,7 @@ function setEnv(e){
         <li><strong>HIIT na esteira:</strong> sempre ao fim — 5min aquecimento, 10 tiros 30/30, 5min volta calma.</li>
       </ul>`;
   } else {
-    document.getElementById('header-sub').textContent = 'Hipertrofia · Guilherme Lessa';
+    document.getElementById('header-sub').textContent = 'Hipertrofia · 80kg · 160g proteína/dia';
     document.getElementById('banner-eyebrow').textContent = 'Estratégia da semana';
     document.getElementById('banner-title').textContent = 'Intensidade alta, falha controlada.';
     document.getElementById('banner-text').textContent = 'Cadência: 1-2s na subida, 3s segurando a descida. Se passar do teto de reps com facilidade, suba a carga.';
@@ -815,6 +827,10 @@ function setEnv(e){
       </ul>`;
   }
 
+  // fecha timer se estiver aberto e volta sempre pra home ao trocar ambiente
+  clearInterval(timerState.interval);
+  document.getElementById('timer-screen').classList.remove('open');
+  showView('view-home');
   renderHome();
 }
 
@@ -852,6 +868,7 @@ function renderHome(){
     card.className='day-card'+(complete?' is-complete':'');
     card.dataset.color = day.color;
 
+    // badge "repete" pra 5ª e 6ª no modo gym
     const repeatTag = (env==='gym' && day.id==='qui') ? '<span style="font-family:var(--f-mono);font-size:.62rem;color:var(--txt-dim)"> · repete 2ª</span>'
                     : (env==='gym' && day.id==='sex') ? '<span style="font-family:var(--f-mono);font-size:.62rem;color:var(--txt-dim)"> · repete 3ª</span>'
                     : '';
@@ -900,6 +917,7 @@ function renderDay(){
   const list = document.getElementById('exercise-list');
   list.innerHTML='';
 
+  // aquecimento + fase badge (modo academia)
   if(env==='gym' && day.aquecimento){
     const f = faseAtual();
     list.insertAdjacentHTML('beforeend',`
@@ -936,7 +954,7 @@ function renderDay(){
         </div>
         <div class="ex-action">
           ${isDone
-            ? `<button class="start-btn" style="background:var(--done-dim); border-color:var(--done); color:var(--done);" onclick="desmarcarEx(${idx})">✓ Feito</button>`
+            ? `<button class="undo-btn" data-idx="${idx}">↩ Desfazer</button>`
             : `<button class="start-btn" data-idx="${idx}">Iniciar</button>`}
         </div>
       </div>
@@ -947,8 +965,15 @@ function renderDay(){
   list.querySelectorAll('.ex-name').forEach(el=>{
     el.addEventListener('click',()=>window.open(`https://www.google.com/search?q=${el.dataset.search}`,'_blank','noopener'));
   });
-  list.querySelectorAll('.start-btn[data-idx]').forEach(btn=>{
+  list.querySelectorAll('.start-btn').forEach(btn=>{
     btn.addEventListener('click',()=>openTimer(currentDayId, parseInt(btn.dataset.idx,10)));
+  });
+  list.querySelectorAll('.undo-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      markExercise(currentDayId, parseInt(btn.dataset.idx,10), false);
+      renderDay();
+      toast('Exercício desmarcado — pode repetir!');
+    });
   });
 }
 
@@ -1065,23 +1090,12 @@ document.getElementById('complete-confirm').addEventListener('click',()=>{
 });
 
 /* ============================================================
-   LÓGICA DE GERENCIAMENTO DE ESTADO DO EXERCÍCIO
-============================================================ */
-function desmarcarEx(idx) {
-  if (confirm('Deseja desmarcar este exercício e deixá-lo pendente para treinar de novo? 🏋️‍♂️')) {
-    markExercise(currentDayId, idx, false);
-    renderDay();
-    toast("Exercício resetado!");
-  }
-}
-
-/* ============================================================
    INIT
 ============================================================ */
 if(env==='gym') document.body.classList.add('gym-mode');
 document.getElementById('btn-casa').classList.toggle('active', env==='casa');
 document.getElementById('btn-gym').classList.toggle('active', env==='gym');
-setEnv(env);
+setEnv(env); // aplica banner e regras corretos
 </script>
 </body>
 </html>
