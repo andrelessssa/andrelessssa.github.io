@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Finanças 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="app">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <span class="dot"></span>
+      Finanças Pessoais
+    </div>
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+      <button class="tab-btn" data-tab="overview">Visão Geral</button>
+    </nav>
+    <button class="topbar-add-btn" id="openAddBtn">+ Nova Despesa</button>
+  </header>
+
+  <main>
+
+    <!-- ===== TAB: DASHBOARD ===== -->
+    <div id="tab-dashboard" class="tab-content active">
+
+      <!-- HEALTH METER -->
+      <div class="health-card" id="healthCard">
+        <div class="health-left">
+          <div class="health-label">Saúde Financeira</div>
+          <div class="health-score" id="healthScore">—</div>
+        </div>
+        <div class="health-bar-wrap">
+          <div class="health-label" id="healthMsg">Selecione um mês</div>
+          <div class="health-bar-track">
+            <div class="health-bar-fill" id="healthBar" style="width:0%"></div>
+          </div>
+          <div class="health-stats">
+            <div class="hstat"><div class="hstat-val green" id="hPaid">R$ 0</div><div class="hstat-lbl">Pago</div></div>
+            <div class="hstat"><div class="hstat-val red" id="hPending">R$ 0</div><div class="hstat-lbl">Pendente</div></div>
+            <div class="hstat"><div class="hstat-val gold" id="hSaldo">R$ 0</div><div class="hstat-lbl">Saldo CX</div></div>
+            <div class="hstat"><div class="hstat-val" id="hPct">0%</div><div class="hstat-lbl">Quitado</div></div>
+          </div>
+        </div>
+        <div class="health-tip" id="healthTip">Selecione um mês para ver sua análise financeira.</div>
+      </div>
+
+      <!-- INCOME BAR -->
+      <div class="income-bar">
+        <div class="income-bar-left">
+          <span class="income-label">Renda Mensal</span>
+          <div class="income-inputs" id="incomeInputsWrap">
+            <div class="income-field">
+              <label>Salário</label>
+              <input type="number" id="incSalary" placeholder="0,00" min="0" step="0.01" />
+            </div>
+            <div class="income-field">
+              <label>Extra</label>
+              <input type="number" id="incExtra" placeholder="0,00" min="0" step="0.01" />
+            </div>
+            <div class="income-field">
+              <label>Outros</label>
+              <input type="number" id="incOther" placeholder="0,00" min="0" step="0.01" />
+            </div>
+            <button class="income-save-btn" id="incomeSaveBtn">Salvar Renda</button>
+          </div>
+        </div>
+        <div class="income-total-wrap">
+          <div class="income-total-label">Total</div>
+          <div class="income-total-val" id="incomeTotalDisplay">R$ 0,00</div>
+        </div>
+      </div>
+
+      <!-- MONTH SELECTOR -->
+      <div class="months-row" id="monthsRow"></div>
+
+      <!-- SUMMARY CARDS -->
+      <div class="summary-grid">
+        <div class="sum-card">
+          <div class="sum-card-label">Total do Mês</div>
+          <div class="sum-card-val gold" id="sumTotal">R$ 0,00</div>
+          <div class="sum-card-sub" id="sumTotalSub">0 despesas</div>
+          <div class="sum-card-bar"><div class="sum-card-bar-fill" id="barTotal" style="width:0%;background:var(--gold)"></div></div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-card-label">Fixas</div>
+          <div class="sum-card-val blue" id="sumFixo">R$ 0,00</div>
+          <div class="sum-card-sub" id="sumFixoSub">—</div>
+          <div class="sum-card-bar"><div class="sum-card-bar-fill" id="barFixo" style="width:0%;background:var(--blue)"></div></div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-card-label">Cartões</div>
+          <div class="sum-card-val gold" id="sumCartoes">R$ 0,00</div>
+          <div class="sum-card-sub" id="sumCartoesSub">—</div>
+          <div class="sum-card-bar"><div class="sum-card-bar-fill" id="barCartoes" style="width:0%;background:var(--gold)"></div></div>
+        </div>
+        <div class="sum-card">
+          <div class="sum-card-label">Pago vs Pendente</div>
+          <div class="sum-card-val green" id="sumPago">R$ 0,00</div>
+          <div class="sum-card-sub red" id="sumPendente">R$ 0,00 pendente</div>
+          <div class="sum-card-bar"><div class="sum-card-bar-fill" id="barPago" style="width:0%;background:var(--green)"></div></div>
+        </div>
+      </div>
+
+      <!-- MAIN GRID -->
+      <div class="main-grid">
+        <div id="expenseList"></div>
+        <div class="sidebar">
+          <div class="widget">
+            <div class="widget-title">Fluxo de Caixa</div>
+            <div id="cfWidget"></div>
+          </div>
+          <div class="widget">
+            <div class="widget-title">Por Categoria</div>
+            <div class="mini-bars" id="miniChartWrap"></div>
+          </div>
+          <div class="widget">
+            <div class="widget-title">Vencimentos do Mês</div>
+            <div class="cal-grid" id="calGrid"></div>
+          </div>
+          <div class="widget">
+            <div class="widget-title">Dicas de Prosperidade</div>
+            <div id="tipsWrap"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TAB: VISÃO GERAL ===== -->
+    <div id="tab-overview" class="tab-content">
+      <div class="overview-toolbar">
+        <div class="overview-title">Visão Geral 2026</div>
+        <div class="overview-legend">
+          <span class="leg-item"><span class="leg-dot paid"></span>Pago</span>
+          <span class="leg-item"><span class="leg-dot pending"></span>Pendente</span>
+          <span class="leg-item"><span class="leg-dot na"></span>N/A</span>
+        </div>
+      </div>
+      <div class="overview-scroll">
+        <table class="ov-table" id="overviewTable"></table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL ADD/EDIT EXPENSE -->
+<div class="modal-backdrop" id="modal-addExpense">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Nova Despesa</div>
+    <div class="form-row">
+      <label class="form-label">Nome</label>
+      <input class="form-input" id="inp-name" placeholder="Ex: Conta de luz" />
+    </div>
+    <div class="form-row-2">
+      <div>
+        <label class="form-label">Valor (R$)</label>
+        <input class="form-input" id="inp-amount" type="number" placeholder="0,00" step="0.01" min="0" />
+      </div>
+      <div>
+        <label class="form-label">Vencimento (dia)</label>
+        <input class="form-input" id="inp-day" type="number" placeholder="10" min="1" max="31" />
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Categoria</label>
+      <select class="form-input form-select" id="inp-cat">
+        <option value="FIXO">Fixo</option>
+        <option value="CARTOES">Cartões</option>
+        <option value="DIVERSOS">Diversos</option>
+        <option value="ACORDOS">Acordos</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Aplicar em</label>
+      <select class="form-input form-select" id="inp-months" multiple style="height:84px">
+        <option value="all" selected>Todos os meses</option>
+        <option value="0">Janeiro</option><option value="1">Fevereiro</option>
+        <option value="2">Março</option><option value="3">Abril</option>
+        <option value="4">Maio</option><option value="5">Junho</option>
+        <option value="6">Julho</option><option value="7">Agosto</option>
+        <option value="8">Setembro</option><option value="9">Outubro</option>
+        <option value="10">Novembro</option><option value="11">Dezembro</option>
+      </select>
+      <div class="form-hint">Ctrl+clique para múltiplos meses</div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Status inicial</label>
+      <select class="form-input form-select" id="inp-status">
+        <option value="pending">Pendente</option>
+        <option value="paid">Pago</option>
+        <option value="na">N/A</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="modalCancelBtn">Cancelar</button>
+      <button class="btn btn-danger" id="deleteBtn" style="display:none">Excluir</button>
+      <button class="btn btn-primary" id="modalSaveBtn">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toastIcon">✓</span>
+  <span id="toastMsg"></span>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
