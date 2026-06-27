@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Produtividade Gamificada</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.3.0/dist/tabler-icons.min.css" />
+</head>
+<body>
+
+<h1 class="sr-only">Sistema de produtividade gamificado</h1>
+
+<div class="app">
+
+  <!-- ABAS -->
+  <nav class="tabs" role="tablist">
+    <button class="tab active" onclick="switchTab('fazendo')" role="tab">
+      <i class="ti ti-player-play" aria-hidden="true"></i> Fazendo agora
+    </button>
+    <button class="tab" onclick="switchTab('tarefas')" role="tab">
+      <i class="ti ti-list-check" aria-hidden="true"></i> Tarefas
+    </button>
+    <button class="tab" onclick="switchTab('trabalho')" role="tab">
+      <i class="ti ti-briefcase" aria-hidden="true"></i> Trabalho
+    </button>
+    <button class="tab" onclick="switchTab('relatorios')" role="tab">
+      <i class="ti ti-chart-bar" aria-hidden="true"></i> Relatórios
+    </button>
+    <button class="tab" onclick="switchTab('conquistas')" role="tab">
+      <i class="ti ti-trophy" aria-hidden="true"></i> Conquistas
+    </button>
+  </nav>
+
+  <!-- FAZENDO AGORA -->
+  <section id="panel-fazendo" class="panel active" role="tabpanel">
+    <div class="xp-bar-wrap">
+      <div id="level-badge" class="level-badge">Nível 1</div>
+      <div class="xp-bar-bg">
+        <div class="xp-bar-fill" id="xp-fill" style="width:0%"></div>
+      </div>
+      <span id="xp-text" class="xp-text">0 / 100 XP</span>
+      <div id="streak-badge" class="streak-badge">🔥 0 dias</div>
+    </div>
+
+    <div class="motivational" id="motivational-msg">
+      <i class="ti ti-bulb" aria-hidden="true"></i>
+      Escolha uma tarefa para começar. Cada minuto conta!
+    </div>
+
+    <p class="section-label">Tarefa ativa</p>
+    <div id="active-task-area">
+      <div class="empty-state">
+        <i class="ti ti-target" aria-hidden="true"></i>
+        Nenhuma tarefa em andamento.<br>Vá para "Tarefas" e clique em Iniciar.
+      </div>
+    </div>
+
+    <p class="section-label">Progresso de hoje</p>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num" id="s-min">0</div><div class="stat-lbl">Minutos focados</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-done">0</div><div class="stat-lbl">Tarefas concluídas</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-pages">0</div><div class="stat-lbl">Páginas lidas</div></div>
+      <div class="stat-card"><div class="stat-num" id="s-xp">0</div><div class="stat-lbl">XP ganho hoje</div></div>
+    </div>
+  </section>
+
+  <!-- TAREFAS -->
+  <section id="panel-tarefas" class="panel" role="tabpanel">
+    <div class="add-task-row">
+      <input type="text" id="new-task-name" placeholder="Nome da tarefa extra..." aria-label="Nome da nova tarefa" />
+      <select id="new-task-cat" aria-label="Categoria da tarefa">
+        <option value="extra">Extra</option>
+        <option value="academia">Academia</option>
+        <option value="trabalho">Trabalho</option>
+        <option value="leitura">Leitura</option>
+        <option value="concurso">Concurso</option>
+        <option value="devsis">Dev sistemas</option>
+        <option value="ingles">Inglês</option>
+      </select>
+      <button class="btn-sm primary" onclick="addCustomTask()">
+        <i class="ti ti-plus" aria-hidden="true"></i> Adicionar
+      </button>
+    </div>
+
+    <p class="section-label">Obrigações fixas</p>
+    <div id="fixed-tasks"></div>
+
+    <p class="section-label">Tarefas extras de hoje</p>
+    <div id="extra-tasks">
+      <p class="empty-text">Nenhuma tarefa extra adicionada ainda.</p>
+    </div>
+  </section>
+
+  <!-- TRABALHO -->
+  <section id="panel-trabalho" class="panel" role="tabpanel">
+    <p class="section-label">O que estou fazendo agora</p>
+    <div class="work-log-area">
+      <textarea id="work-now" placeholder="Descreva o que você está fazendo agora no trabalho..." aria-label="Atividade atual no trabalho"></textarea>
+      <div class="work-log-actions">
+        <button class="btn-sm" onclick="openNewTab()">
+          <i class="ti ti-external-link" aria-hidden="true"></i> Abrir aba
+        </button>
+        <button class="btn-sm primary" onclick="saveWorkLog()">
+          <i class="ti ti-check" aria-hidden="true"></i> Registrar
+        </button>
+      </div>
+    </div>
+    <p class="section-label">Histórico de atividades</p>
+    <div id="work-history">
+      <p class="empty-text">Nenhum registro ainda.</p>
+    </div>
+  </section>
+
+  <!-- RELATÓRIOS -->
+  <section id="panel-relatorios" class="panel" role="tabpanel">
+    <div class="report-tabs" role="group" aria-label="Período do relatório">
+      <button class="rtab active" onclick="switchReport('semana')">Esta semana</button>
+      <button class="rtab" onclick="switchReport('mes')">Este mês</button>
+      <button class="rtab" onclick="switchReport('ano')">Este ano</button>
+    </div>
+    <div class="stat-grid" id="report-stats"></div>
+    <div class="chart-wrap">
+      <canvas id="reportChart" role="img" aria-label="Gráfico de minutos por tarefa">Dados de tempo por tarefa.</canvas>
+    </div>
+  </section>
+
+  <!-- CONQUISTAS -->
+  <section id="panel-conquistas" class="panel" role="tabpanel">
+    <p class="section-label">Suas conquistas</p>
+    <div class="achievement-grid" id="achievements-grid"></div>
+  </section>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
