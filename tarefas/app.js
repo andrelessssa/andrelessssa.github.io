@@ -196,6 +196,10 @@ function taskHTML(t) {
             ? `<span class="timer-display">${fmt(t.elapsed)}</span>
                <button class="btn-sm danger"  onclick="stopTask()">Parar</button>
                <button class="btn-sm success" onclick="completeTask(${t.id})">Concluir</button>`
+            : t.doneToday
+            ? `<button class="btn-sm done-btn" onclick="undoTask(${t.id})">
+                 <i class="ti ti-check" aria-hidden="true"></i> Feito
+               </button>`
             : `<button class="btn-sm primary" onclick="startTask(${t.id})"
                  ${S.activeId && S.activeId !== t.id ? 'disabled' : ''}>
                  <i class="ti ti-player-play" aria-hidden="true"></i> Iniciar
@@ -307,8 +311,16 @@ function checkAchievements() {
   check(7, S.level >= 10, '');
 }
 
-/* ============================================================
-   ADICIONAR TAREFA EXTRA
+function undoTask(id) {
+  const t = allTasks().find(x => x.id === id);
+  if (!t) return;
+  t.doneToday = false;
+  t.elapsed = 0;
+  renderTasks();
+  updateTodayStats();
+}
+
+
    ============================================================ */
 function addCustomTask() {
   const nameEl = document.getElementById('new-task-name');
