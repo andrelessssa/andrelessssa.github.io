@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>Abdo · Treino</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="gym-mode">
+
+<!-- HEADER -->
+<div class="app-header">
+  <div class="avatar-ring">A</div>
+  <div class="header-text">
+    <h1>Treino do Abdo</h1>
+    <p id="header-sub">Academia · Hipertrofia avançada</p>
+  </div>
+  <div class="streak-pill">🔥 <span id="streak-val">0</span> dias</div>
+</div>
+
+<!-- ============================================================
+     VIEW: HOME
+============================================================ -->
+<div class="view active" id="view-home">
+  <div class="hero-banner panel-surface">
+    <div class="eyebrow accent-color" id="banner-eyebrow">Academia — modo avançado</div>
+    <h2 id="banner-title">Conexão mente-músculo. Carga progressiva.</h2>
+    <p id="banner-text">Aquecimento sempre antes de intensidade. Drop sets sem descanso entre as quedas de carga — só descansa ao fim do conjunto.</p>
+  </div>
+
+  <div class="week-grid" id="week-grid"></div>
+
+  <div class="progress-strip panel-surface">
+    <div class="ps-label">Semana</div>
+    <div class="ps-track"><div class="ps-fill" id="week-fill" style="width:0%"></div></div>
+    <div class="ps-val" id="week-val">0/5</div>
+  </div>
+
+  <div class="golden-rules panel-surface" id="golden-rules-block"></div>
+</div>
+
+<!-- ============================================================
+     VIEW: DIA
+============================================================ -->
+<div class="view" id="view-day">
+  <div class="day-view-header">
+    <button class="back-btn" id="btn-back-home">←</button>
+    <div class="title-block">
+      <h2 id="day-title">—</h2>
+      <p id="day-sub">—</p>
+    </div>
+    <div class="day-progress-mini accent-color" id="day-progress-mini">0/0</div>
+  </div>
+  <div class="exercise-list" id="exercise-list"></div>
+</div>
+
+<!-- TIMER -->
+<div class="timer-screen" id="timer-screen">
+  <div class="timer-top">
+    <button class="back-btn" id="btn-back-day">←</button>
+    <span class="ex-tag" id="timer-ex-tag">Exercício 1 de 6</span>
+  </div>
+  <div class="timer-body">
+    <div class="timer-phase-label work" id="timer-phase-label">Em execução</div>
+    <div class="serie-counter work" id="serie-counter">SÉRIE 1 DE ?</div>
+    <div class="timer-exname" id="timer-exname">—</div>
+    <div class="timer-target" id="timer-target">—</div>
+    <div class="ring-wrap">
+      <svg viewBox="0 0 200 200">
+        <circle class="ring-bg" cx="100" cy="100" r="90"></circle>
+        <circle class="ring-fg work" id="ring-fg" cx="100" cy="100" r="90" stroke-dasharray="565.5" stroke-dashoffset="0"></circle>
+      </svg>
+      <div class="ring-center">
+        <div class="timer-clock" id="timer-clock">00:00</div>
+        <div class="timer-sub" id="timer-sub">toque em iniciar</div>
+      </div>
+    </div>
+  </div>
+  <div class="timer-controls">
+    <button class="tbtn ghost" id="btn-pause">Pausar</button>
+    <button class="tbtn primary-fire" id="btn-main-action">Concluir série</button>
+  </div>
+  <button class="timer-skip" id="btn-skip">pular esta etapa →</button>
+</div>
+
+<!-- COMPLETION MODAL -->
+<div class="complete-overlay" id="complete-overlay">
+  <div class="complete-card panel-surface">
+    <div class="complete-emoji">💪</div>
+    <h2 id="complete-title">Treino concluído!</h2>
+    <p id="complete-text">—</p>
+    <button class="btn-confirm" id="complete-confirm">Voltar ao início</button>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+  <audio id="beep-audio" src="som.mp3" preload="auto"></audio>
+  <script src="script.js"></script>
+</body>
+</html>
